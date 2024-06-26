@@ -1,6 +1,8 @@
 package com.study.idea.demos.web.control;
 
+import com.study.idea.demos.web.entity.DTO.UserDTO;
 import com.study.idea.demos.web.entity.User;
+import com.study.idea.demos.web.entity.VO.UserVO;
 import com.study.idea.demos.web.servie.UserService;
 import com.study.idea.demos.web.util.RedisUtil;
 import com.study.idea.demos.web.util.StatusUtil;
@@ -33,7 +35,7 @@ public class UserController {
     }
     @RequestMapping("/register")
     @ResponseBody
-    public StatusUtil.ErrorCode register(@RequestBody User user)//注册
+    public StatusUtil.ErrorCode register(User user)//注册
     {
         if(user.getEmail() == null){//邮箱不能为空
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
@@ -58,9 +60,13 @@ public class UserController {
     }
     @RequestMapping("/user/showDetails")
     @ResponseBody
-    public User showDetails(@RequestBody User user)
+    public UserVO showDetails(@RequestBody User user)
     {
-        return userService.showDetails(user);
+        User dbUser = userService.showDetails(user);
+        if(dbUser==null){
+            return null;
+        }
+        return userService.changeToVO(dbUser);
     }
     @RequestMapping("/sendMail")
     @ResponseBody

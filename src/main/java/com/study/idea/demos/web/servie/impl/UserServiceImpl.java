@@ -1,7 +1,10 @@
 package com.study.idea.demos.web.servie.impl;
 
+import com.alipay.api.domain.UserVo;
 import com.study.idea.demos.web.dao.UserMapper;
+import com.study.idea.demos.web.entity.DTO.UserDTO;
 import com.study.idea.demos.web.entity.User;
+import com.study.idea.demos.web.entity.VO.UserVO;
 import com.study.idea.demos.web.servie.UserService;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.MD5Util;
@@ -113,5 +116,35 @@ public class UserServiceImpl implements UserService {
             dbUser.setPassword(null);
         }
         return dbUser;
+    }
+    public User changeToEntity(UserDTO userDTO){
+        User user=new User();
+        user.setAccount(userDTO.getAccount());
+        user.setEmail(userDTO.getEmail());
+        return user;
+    }
+    public UserVO changeToVO(User user){
+        UserVO userVO=new UserVO();
+        userVO.setId(user.getId());
+        userVO.setAccount(user.getAccount());
+        userVO.setEmail(user.getEmail());
+        userVO.setNickname(user.getNickname());
+        String role="";
+        switch (user.getRole()){
+            case 0:
+                role="管理员";
+                break;
+            case 1:
+                role="学生";
+                break;
+            case 2:
+                role="教师";
+                break;
+            default:
+                role="未知";
+        }
+        userVO.setRole(role);
+        userVO.setStatus(user.getStatus());
+        return userVO;
     }
 }
