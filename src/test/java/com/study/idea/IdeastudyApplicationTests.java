@@ -38,11 +38,6 @@ class IdeastudyApplicationTests {
         user.setPassword("123456");
         System.out.println(userService.checkLogin(user));
     }
-    @Test
-    void testChangeRequestUrl(){
-        String url="G:\\resource\\image\\zhanghao\\排序算法\\深入学习CSAPP\\wallhaven-1kgllv.jpg";
 
-        System.out.println(resourceService.changeToRequestUrl(url));
-    }
 
 }

@@ -12,6 +12,7 @@ public class CourseVO {
     String name;
     String description;
     String courseLogo;
+    String courseLogoRequestUrl;
     double price;
     String teacherName;
     String categoryName;

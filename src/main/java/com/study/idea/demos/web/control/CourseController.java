@@ -7,12 +7,15 @@ import com.study.idea.demos.web.entity.VO.CourseVO;
 import com.study.idea.demos.web.servie.CourseService;
 import com.study.idea.demos.web.util.NameUtil;
 import com.study.idea.demos.web.util.StatusUtil;
+import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,25 +25,53 @@ public class CourseController {
     @Autowired
     private NameUtil nameUtil;
     @Autowired
+    private UrlUtil urlUtil;
+    @Autowired
     private CourseService courseService;
     @RequestMapping("/add")
     @ResponseBody
     public StatusUtil.ErrorCode add(CourseDTO courseDTO){
-        if(courseDTO.getFile()!=null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        Course course = courseService.changeToEntity(courseDTO);
+        if(!courseDTO.getFile().isEmpty()) {
+            String dirUrl = urlUtil.getUrl(courseDTO);
+            String writeUrl = dirUrl + "\\" + courseDTO.getFile().getOriginalFilename();
+            File dir=new File(dirUrl);
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+            File dest=new File(writeUrl);
+            course.setCourseLogo(writeUrl);
+            try {
+                courseDTO.getFile().transferTo(dest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        Course course = new Course();
-        course.setName(courseDTO.getName());
-        course.setDescription(courseDTO.getDescription());
-        course.setPrice(courseDTO.getPrice());
-        course.setTeacherId(courseDTO.getTeacherId());
-        course.setCategoryId(courseDTO.getCategoryId());
-
         return courseService.insert(course);
     }
     @RequestMapping("/publish")
     @ResponseBody
-    public StatusUtil.ErrorCode publish(@RequestBody Course course){
+    public StatusUtil.ErrorCode publish(CourseDTO courseDTO){
+        Course course = courseService.changeToEntity(courseDTO);
+        if(!courseDTO.getFile().isEmpty()){
+            String dirUrl = urlUtil.getUrl(courseDTO);
+            String writeUrl = dirUrl + "\\" + courseDTO.getFile().getOriginalFilename();
+            course.setCourseLogo(writeUrl);
+            File dir=new File(dirUrl);
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+            File dest=new File(writeUrl);
+            try {
+                courseDTO.getFile().transferTo(dest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        StatusUtil.ErrorCode code= courseService.checkPram(course);
+        if(code!=StatusUtil.ErrorCode.OK){
+            return code;
+        }
         return courseService.publish(course);
     }
     @RequestMapping("/findByCategory")

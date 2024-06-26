@@ -10,6 +10,7 @@ import com.study.idea.demos.web.entity.Resource;
 import com.study.idea.demos.web.entity.VO.ResourceVO;
 import com.study.idea.demos.web.servie.ResourceService;
 import com.study.idea.demos.web.util.StatusUtil;
+import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,8 @@ public class ResourceServiceImpl implements ResourceService {
     private ChapterMapper chapterMapper;
     @Autowired
     private CourseMapper courseMapper;
+    @Autowired
+    private UrlUtil urlUtil;
     @Override
     public List<Resource> findByChapterId(Chapter chapter) {
         if(chapter.getId()==0){
@@ -88,16 +91,10 @@ public class ResourceServiceImpl implements ResourceService {
             Course course=courseMapper.findById(chapter.getCourseId());
             resourceVO.setChapterName(chapter.getName());
             resourceVO.setCourseName(course.getName());
-            resourceVO.setRequestUrl(changeToRequestUrl(resource.getUrl()));
+            resourceVO.setRequestUrl(urlUtil.changeToRequestUrl(resource.getUrl()));
             result.add(resourceVO);
         }
         return result;
-    }
-
-    public String changeToRequestUrl(String url){
-        String requestUrl=url.replace("G:\\resource\\", WebConfig.basePath).replace("\\","/");
-
-        return requestUrl;
     }
 
 }
