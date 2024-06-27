@@ -17,6 +17,21 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
     @Override
+    public StatusUtil.ErrorCode checkPram(User user){
+        if(user == null|| user.getAccount() == null|| user.getPassword() == null||user.getEmail()==null){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        User dbUser=userMapper.findByAccount(user);
+        if(dbUser!=null){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        dbUser=userMapper.findByEmail(user);
+        if(dbUser!=null){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        return StatusUtil.ErrorCode.OK;
+    }
+    @Override
     public StatusUtil.ErrorCode checkLogin(User user){//登录验证
         if(user.getAccount() == null|| user.getPassword() == null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
@@ -37,17 +52,6 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public StatusUtil.ErrorCode register(User user){
-        if(user == null|| user.getAccount() == null|| user.getPassword() == null||user.getEmail()==null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        User dbUser=userMapper.findByAccount(user);
-        if(dbUser!=null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        dbUser=userMapper.findByEmail(user);
-        if(dbUser!=null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
         Date date=new Date();
         user.setCreateTime(date);
         user.setUpdateTime(date);
@@ -120,7 +124,10 @@ public class UserServiceImpl implements UserService {
     public User changeToEntity(UserDTO userDTO){
         User user=new User();
         user.setAccount(userDTO.getAccount());
+        user.setNickname(userDTO.getNickname());
         user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+        user.setRole(userDTO.getRole());
         return user;
     }
     public UserVO changeToVO(User user){

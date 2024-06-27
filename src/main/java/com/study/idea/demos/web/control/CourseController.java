@@ -3,6 +3,7 @@ package com.study.idea.demos.web.control;
 import com.study.idea.demos.web.entity.Category;
 import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.DTO.CourseDTO;
+import com.study.idea.demos.web.entity.User;
 import com.study.idea.demos.web.entity.VO.CourseVO;
 import com.study.idea.demos.web.servie.CourseService;
 import com.study.idea.demos.web.util.NameUtil;
@@ -79,6 +80,14 @@ public class CourseController {
     public List<CourseVO> findByCategoryId(@RequestBody Category category){
         List<Course> lists = courseService.findByCategoryId(category);
         return  courseService.changeToVO(lists);
+    }
+    @RequestMapping("/findAll")
+    @ResponseBody
+    public List<CourseVO> findAll(@RequestBody User user){
+        if(user.getId()==0){
+            return null;
+        }
+        return courseService.changeToVO(courseService.findAll(user));
     }
 
 }

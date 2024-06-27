@@ -7,8 +7,6 @@ import java.util.Date;
 @Data
 public class ResourceDTO {
     int id;
-    Date createTime;
-    Date updateTime;
     int status;//0正常1禁用
     String name;
     String type;

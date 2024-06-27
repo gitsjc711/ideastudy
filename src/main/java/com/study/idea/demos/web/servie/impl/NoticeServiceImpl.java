@@ -66,6 +66,9 @@ public class NoticeServiceImpl implements NoticeService{
     }
     public List<NoticeVO> changeToVO(List<Notice> notices){
         List<NoticeVO> resultList=new ArrayList<>();
+        if(notices.isEmpty()){
+            return resultList;
+        }
         for(Notice notice:notices){
             NoticeVO noticeVO=new NoticeVO();
             noticeVO.setId(notice.getId());

@@ -8,6 +8,7 @@ import com.study.idea.demos.web.util.StatusUtil;
 
 public interface UserService {
     StatusUtil.ErrorCode checkLogin(User user);
+    StatusUtil.ErrorCode checkPram(User user);
     StatusUtil.ErrorCode register(User user);
     StatusUtil.ErrorCode update(User user);
     User showDetails(User user);

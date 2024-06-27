@@ -2,10 +2,12 @@ package com.study.idea.demos.web.servie.impl;
 
 import com.study.idea.demos.web.dao.CategoryMapper;
 import com.study.idea.demos.web.dao.CourseMapper;
+import com.study.idea.demos.web.dao.OrderMapper;
 import com.study.idea.demos.web.dao.UserMapper;
 import com.study.idea.demos.web.entity.Category;
 import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.DTO.CourseDTO;
+import com.study.idea.demos.web.entity.Order;
 import com.study.idea.demos.web.entity.User;
 import com.study.idea.demos.web.entity.VO.CourseVO;
 import com.study.idea.demos.web.servie.CourseService;
@@ -30,6 +32,8 @@ public class CourseServiceImpl implements CourseService {
     private UserMapper userMapper;
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private OrderMapper orderMapper;
     @Autowired
     private UrlUtil urlUtil;
     @Override
@@ -77,16 +81,35 @@ public class CourseServiceImpl implements CourseService {
         if(category.getId()==0){
             return null;
         }
-        List<Course> lists=courseMapper.findByCategoryId(category.getId());
-        Iterator<Course> iterator=lists.iterator();
+        List<Course> list=courseMapper.findByCategoryId(category.getId());
+        Iterator<Course> iterator=list.iterator();
         while(iterator.hasNext()){
             Course i = iterator.next();
             if(i.getStatus() == 1){
                 iterator.remove();
             }
         }
-        return lists;
+        return list;
     }
+    @Override
+    public List<Course> findAll(User user){
+        List<Course> list=courseMapper.findAll();
+        List<Order> orders=orderMapper.findByUserId(user.getId());
+        Iterator<Course> iterator=list.iterator();
+        while(iterator.hasNext()){
+            Course i = iterator.next();
+            if(i.getStatus() == 1){
+                iterator.remove();
+            }
+            for(Order order:orders){
+                if(order.getCourseId()==i.getId()){
+                    iterator.remove();
+                }
+            }
+        }
+        return list;
+    }
+
 
     @Override
     public StatusUtil.ErrorCode insert(Course course) {
@@ -117,12 +140,12 @@ public class CourseServiceImpl implements CourseService {
         for(Course course:courses){
             CourseVO courseVO = new CourseVO();
             courseVO.setId(course.getId());
-            courseVO.setStatus(course.getStatus());
             courseVO.setName(course.getName());
             courseVO.setDescription(course.getDescription());
             courseVO.setPrice(course.getPrice());
             courseVO.setCourseLogo(course.getCourseLogo());
-            courseVO.setCourseLogoRequestUrl(urlUtil.changeToRequestUrl(course.getCourseLogo()));
+            String url = urlUtil.changeToRequestUrl(course.getCourseLogo());
+            courseVO.setCourseLogoRequestUrl(url);
             Category category = categoryMapper.findById(course.getCategoryId());
             courseVO.setCategoryName(category.getCategoryName());
             User teacher = userMapper.findById(course.getTeacherId());

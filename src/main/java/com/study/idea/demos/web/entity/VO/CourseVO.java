@@ -6,9 +6,6 @@ import java.util.Date;
 @Data
 public class CourseVO {
     int id;
-    Date createTime;
-    Date updateTime;
-    int status;//0正常1禁用2待发布
     String name;
     String description;
     String courseLogo;

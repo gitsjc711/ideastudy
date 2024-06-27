@@ -14,6 +14,8 @@ public interface CourseMapper {
     Course findByName(Course course);
     @Select("select id,status,name,description,course_logo as courseLogo,price,teacher_id as teacherId,category_id as categoryId from course where id=#{id}")
     Course findById(int id);
+    @Select("select id,status,name,description,course_logo as courseLogo,price,teacher_id as teacherId,category_id as categoryId from course")
+    List<Course> findAll();
     @Select("select id,status,name,description,course_logo as courseLogo,price,teacher_id as teacherId,category_id as categoryId from course where category_id=#{categoryId}")
     List<Course> findByCategoryId(int categoryId);
     @Insert("insert into course(create_time,update_time,status,name,description,course_logo,price,teacher_id,category_id) values(#{createTime},#{updateTime},#{status},#{name},#{description},#{courseLogo},#{price},#{teacherId},#{categoryId})")
