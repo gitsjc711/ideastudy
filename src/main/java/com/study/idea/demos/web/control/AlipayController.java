@@ -32,25 +32,14 @@ public class AlipayController {
     AlipayService alipayService;
     @Autowired
     NameUtil nameUtil;
-    @RequestMapping("/add")//添加订单
-    @ResponseBody
-    public StatusUtil.ErrorCode add(@RequestBody Order order)
-    {
+    @RequestMapping("/pay")//支付
+    public void pay(Order order, HttpServletResponse response) throws IOException {
         StatusUtil.ErrorCode check=alipayService.checkOrder(order);
         if(check!=StatusUtil.ErrorCode.OK)
         {
-            return check;
+            return ;
         }
-        return alipayService.add(order);
-    }
-    @RequestMapping("/pay")//支付
-    @ResponseBody
-    public StatusUtil.ErrorCode pay(Order order, HttpServletResponse response) throws IOException {
-        StatusUtil.ErrorCode check=alipayService.checkPay(order);
-        if(check!=StatusUtil.ErrorCode.OK)
-        {
-            return check;
-        }
+        alipayService.add(order);
         Course course=new Course();
         course.setId(order.getCourseId());
         String courseName=nameUtil.ChangeIdToName(course);
@@ -58,7 +47,7 @@ public class AlipayController {
         user.setId(order.getUserId());
         String userName=nameUtil.ChangeIdToName(user);
         if(courseName==null||userName==null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+            return ;
         }
         AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.gatewayurl, AlipayConfig.app_id
                 , AlipayConfig.merchant_private_key, "json", AlipayConfig.charset
@@ -83,7 +72,7 @@ public class AlipayController {
             form = alipayClient.pageExecute(alipayRequest).getBody();
             // 返回给前端
         } catch (AlipayApiException e) {
-            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+            return ;
             // 处理异常，返回错误信息给前端
         }
         response.setContentType("text/html;charset=" +  AlipayConfig.charset);
@@ -91,7 +80,6 @@ public class AlipayController {
         response.getWriter().write(form);
         response.getWriter().flush();
         response.getWriter().close();
-        return StatusUtil.ErrorCode.OK;
     }
     @RequestMapping("/notify")
     public void payNotify(HttpServletRequest request) throws Exception
@@ -106,8 +94,9 @@ public class AlipayController {
             }
 
             String tradeNo = params.get("out_trade_no");
-            String gmtPayment = params.get("gmt_payment");
-            String alipayTradeNo = params.get("trade_no");
+            String courseName=params.get("subject");
+            String userName=params.get("body");
+            String actualPrice=params.get("total_amount");
             // 支付宝验签
             if (AlipaySignature.rsaCheckV1(params, AlipayConfig.alipay_public_key, AlipayConfig.charset, AlipayConfig.sign_type)) {
                 // 验签通过
@@ -122,6 +111,14 @@ public class AlipayController {
                 System.out.println("买家账户:"+params.get("body"));
                 Order order =new Order();
                 order.setOrderNo(tradeNo);
+                Course course=new Course();
+                course.setName(courseName);
+                order.setCourseId(nameUtil.changeNameToId(course));
+                User user=new User();
+                user.setAccount(userName);
+                order.setUserId(nameUtil.changeNameToId(user));
+                order.setActualPrice(Double.parseDouble(actualPrice));
+                alipayService.add(order);
                 if(alipayService.pay(order)== StatusUtil.ErrorCode.OK){
                     System.out.println("交易成功");
                 }else{
@@ -129,6 +126,30 @@ public class AlipayController {
                 }
             }
         }
+    }
+    @RequestMapping("/return")
+    public String payReturn(HttpServletRequest request) throws Exception
+    {
+        boolean signVerified=signVerified(request);
+        // 同步执行，返回界面
+        if (signVerified) {
+            System.out.println("AlipayController.returnUrl" + "----前往支付成功页面");
+            //todo
+
+            return "redirect:http://www.baidu.com";
+        } else {
+            System.out.println("AlipayController.returnUrl" + "----前往支付失败页面");
+            return "redirect:http://www.baidu.com";
+        }
+    }
+    private boolean signVerified(HttpServletRequest request)throws Exception {
+        // 获取支付宝GET过来反馈信息
+        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String[]> requestParams = request.getParameterMap();
+        for (String name : requestParams.keySet()) {
+            params.put(name, request.getParameter(name));
+        }
+        return AlipaySignature.rsaCheckV1(params, AlipayConfig.alipay_public_key, AlipayConfig.charset, AlipayConfig.sign_type); // 调用SDK验证签名
     }
     @RequestMapping("/findByUid")
     @ResponseBody

@@ -11,6 +11,7 @@ import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -77,9 +78,33 @@ public class CourseController {
     }
     @RequestMapping("/findByCategory")
     @ResponseBody
-    public List<CourseVO> findByCategoryId(@RequestBody Category category){
-        List<Course> lists = courseService.findByCategoryId(category);
+    public List<CourseVO> findByCategory(String categoryName,int uid){
+        if(categoryName==null||uid==0){
+            return null;
+        }
+        Category category = new Category();
+        category.setCategoryName(categoryName);
+        category.setId(nameUtil.changeNameToId(category));
+        List<Course> list = courseService.findByCategoryId(category);
+        User user = new User();
+        user.setId(uid);
+        List<Course> lists = courseService.exceptBuy(list,user);
         return  courseService.changeToVO(lists);
+    }
+    @RequestMapping("/findByTeacher")
+    @ResponseBody
+    public List<CourseVO> findByTeacher(String teacherName,int uid){
+        if(teacherName==null||uid==0){
+            return null;
+        }
+        User user = new User();
+        user.setAccount(teacherName);
+        user.setId(nameUtil.changeNameToId(user));
+        List<Course> list = courseService.findByTeacherId(user);
+        User user1 = new User();
+        user1.setId(uid);
+        List<Course> lists = courseService.exceptBuy(list,user1);
+        return courseService.changeToVO(lists);
     }
     @RequestMapping("/findAll")
     @ResponseBody

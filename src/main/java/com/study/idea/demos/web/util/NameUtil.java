@@ -71,6 +71,44 @@ public class NameUtil {
             return null;
         }
     }
-
+    public int changeNameToId(Course course){
+        Course dbCourse;
+        if(course.getName()!=null){
+            dbCourse = courseMapper.findByName(course);
+            if(dbCourse==null){
+                return 0;
+            }else {
+                return dbCourse.getId();
+            }
+        }else {
+            return 0;
+        }
+    }
+    public int changeNameToId(User user){
+        User dbUser;
+        if(user.getAccount()!=null){
+            dbUser = userMapper.findByAccount(user);
+            if(dbUser==null){
+                return 0;
+            }else {
+                return dbUser.getId();
+            }
+        }else {
+            return 0;
+        }
+    }
+    public int changeNameToId(Category category){
+        Category dbCategory;
+        if(category.getCategoryName()!=null){
+            dbCategory = categoryMapper.findByName(category);
+            if(dbCategory==null){
+                return 0;
+            }else {
+                return dbCategory.getId();
+            }
+        }else {
+            return 0;
+        }
+    }
 
 }

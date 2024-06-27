@@ -12,7 +12,7 @@ public class UserDTO {
     String password;
     String nickname;
     String email;
-    int role;//0管理员1学生2老师
-    int code;
-    MultipartFile file;
+    String role;//0管理员1学生2老师
+    String code;
+    MultipartFile avatar;
 }

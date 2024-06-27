@@ -12,4 +12,5 @@ public class UserVO {
     String nickname;
     String email;
     String role;//0管理员1学生2老师
+    String userAvatarRequestUrl;
 }

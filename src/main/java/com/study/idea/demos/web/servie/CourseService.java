@@ -13,6 +13,8 @@ public interface CourseService {
     Course findByName(Course course);
     StatusUtil.ErrorCode checkPram(Course course);
     List<Course> findByCategoryId(Category category);
+    List<Course> findByTeacherId(User user);
+    List<Course> exceptBuy(List<Course> list,User user);
     List<Course> findAll(User user);
     StatusUtil.ErrorCode insert(Course course);
     StatusUtil.ErrorCode publish(Course course);

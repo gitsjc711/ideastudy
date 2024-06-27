@@ -92,6 +92,22 @@ public class CourseServiceImpl implements CourseService {
         return list;
     }
     @Override
+    public List<Course> findByTeacherId(User user){
+        if(user.getId()==0){
+            return null;
+        }
+        List<Course> list=courseMapper.findByTeacherId(user.getId());
+        Iterator<Course> iterator=list.iterator();
+        while(iterator.hasNext()){
+            Course i = iterator.next();
+            if(i.getStatus() == 1){
+                iterator.remove();
+            }
+        }
+        return list;
+    }
+
+    @Override
     public List<Course> findAll(User user){
         List<Course> list=courseMapper.findAll();
         List<Order> orders=orderMapper.findByUserId(user.getId());
@@ -109,7 +125,23 @@ public class CourseServiceImpl implements CourseService {
         }
         return list;
     }
-
+    @Override
+    public List<Course> exceptBuy(List<Course> list,User user){
+        if(list==null){
+            return null;
+        }
+        List<Order> orders=orderMapper.findByUserId(user.getId());
+        Iterator<Course> iterator=list.iterator();
+        while(iterator.hasNext()){
+            Course i = iterator.next();
+            for(Order order:orders){
+                if(order.getCourseId()==i.getId()){
+                    iterator.remove();
+                }
+            }
+        }
+        return list;
+    }
 
     @Override
     public StatusUtil.ErrorCode insert(Course course) {
@@ -136,6 +168,9 @@ public class CourseServiceImpl implements CourseService {
         }
     }
     public List<CourseVO> changeToVO(List<Course> courses){
+        if(courses==null){
+            return null;
+        }
         List<CourseVO> result = new ArrayList<>();
         for(Course course:courses){
             CourseVO courseVO = new CourseVO();

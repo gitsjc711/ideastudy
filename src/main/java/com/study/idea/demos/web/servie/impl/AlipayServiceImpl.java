@@ -41,26 +41,9 @@ public class AlipayServiceImpl implements AlipayService {
         }
         return StatusUtil.ErrorCode.OK;
     }
-    public StatusUtil.ErrorCode checkPay(Order order){
-        if(order.getOrderNo()==null||order.getCourseId()==0||order.getUserId()==0){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        Course course=courseMapper.findById(order.getCourseId());
-        User user=userMapper.findById(order.getUserId());
-        if(course==null||user==null){
-            return StatusUtil.ErrorCode.NOT_EXISTS;
-        }
-        if(course.getPrice()!=order.getActualPrice()){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        if(orderMapper.findByOrderNo(order.getOrderNo())==null){
-            return StatusUtil.ErrorCode.NOT_EXISTS;
-        }
-        return StatusUtil.ErrorCode.OK;
-    }
+
     @Override
     public StatusUtil.ErrorCode add(Order order) {
-        checkOrder(order);
         Date date=new Date();
         order.setCreateTime(date);
         order.setUpdateTime(date);

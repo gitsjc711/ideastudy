@@ -7,6 +7,7 @@ import com.study.idea.demos.web.servie.UserService;
 import com.study.idea.demos.web.util.RedisUtil;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.UrlUtil;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,18 +49,18 @@ public class UserController {
         if(errorCode!=StatusUtil.ErrorCode.OK){
             return errorCode;
         }
-        if(userDTO.getCode()==0||userDTO.getFile().isEmpty()){
+        if(userDTO.getCode()==null||userDTO.getAvatar()==null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
         Object object=redisUtil.get(user.getEmail());
         if(object==null){//验证码失效
             return StatusUtil.ErrorCode.TIMEOUT;
         }
-        int code = (int)object;
-        if(userDTO.getCode()==code) {//验证码正确
+        String code = String.valueOf(object);
+        if(userDTO.getCode().equals(code)) {//验证码正确
             redisUtil.delete(user.getEmail());
             String dirUrl=urlUtil.getUrl(userDTO);
-            String writeUrl=dirUrl+"\\"+userDTO.getFile().getOriginalFilename();
+            String writeUrl=dirUrl+"\\"+userDTO.getAvatar().getOriginalFilename();
             user.setUserAvatar(writeUrl);
             File dir=new File(dirUrl);
             if(!dir.exists()){
@@ -66,7 +68,7 @@ public class UserController {
             }
             File dest=new File(writeUrl);
             try {
-                userDTO.getFile().transferTo(dest);
+                userDTO.getAvatar().transferTo(dest);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

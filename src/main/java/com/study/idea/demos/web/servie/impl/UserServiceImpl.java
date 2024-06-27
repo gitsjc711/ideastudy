@@ -8,6 +8,7 @@ import com.study.idea.demos.web.entity.VO.UserVO;
 import com.study.idea.demos.web.servie.UserService;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.MD5Util;
+import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,8 @@ import java.util.Date;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private UrlUtil urlUtil;
     @Override
     public StatusUtil.ErrorCode checkPram(User user){
         if(user == null|| user.getAccount() == null|| user.getPassword() == null||user.getEmail()==null){
@@ -127,7 +130,14 @@ public class UserServiceImpl implements UserService {
         user.setNickname(userDTO.getNickname());
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
-        user.setRole(userDTO.getRole());
+        switch (userDTO.getRole()){
+            case "student":
+                user.setRole(1);
+                break;
+            case "teacher":
+                user.setRole(2);
+                break;
+        }
         return user;
     }
     public UserVO changeToVO(User user){
@@ -152,6 +162,7 @@ public class UserServiceImpl implements UserService {
         }
         userVO.setRole(role);
         userVO.setStatus(user.getStatus());
+        userVO.setUserAvatarRequestUrl(urlUtil.changeToRequestUrl(user.getUserAvatar()));
         return userVO;
     }
 }
