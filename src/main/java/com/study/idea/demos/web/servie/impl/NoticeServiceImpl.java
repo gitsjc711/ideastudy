@@ -65,6 +65,9 @@ public class NoticeServiceImpl implements NoticeService{
         }
     }
     public List<NoticeVO> changeToVO(List<Notice> notices){
+        if(notices==null){
+            return null;
+        }
         List<NoticeVO> resultList=new ArrayList<>();
         if(notices.isEmpty()){
             return resultList;

@@ -16,9 +16,10 @@ public class AlipayConfig {
     // 支付宝公钥,查看地址：https://openhome.alipay.com/develop/sandbox/app 对应APPID下的支付宝公钥。
     public static String alipay_public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjBXBvbBr7E/UPbobr/lHpyo0s8u4FYWeIotsX2fxg3vKbfN/DYV8ATItmUbqWwTZr6ANMnHJGHW9cwRc7fPYvfs3HabJVkcf7RKjoV2ky2nU+VqYjZgAVYrE+OAniiEVYJNk7meG4o2p0JbVomv75VfBsbzYTi7L0OK1F6Jf1dDjad/Vg1WbGF65bJuriBEUW7fROFAD6XK7zQtDl/pfBYPDcPc2GNWx+UK7MjuMNOHYW0IFGxueSG3dytC4ntxM4gnRN/7gSXuk4rf/7L3blksewiDau7E9E6K+64GqXy4IuBpTKnu8WsBx7xhfhmINzfVmxqEAbLRgVKvBsl7/9QIDAQAB";
     // 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数
-    public static String return_url = "http://rtks8e.natappfree.cc/order/return";
+    public static String base_url=" http://g8wfg9.natappfree.cc";
+    public static String return_url = base_url+"/order/return";
     // 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
-    public static String notify_url = "http://rtks8e.natappfree.cc/order/notify";
+    public static String notify_url = base_url+"/order/notify";
 
     // 签名方式
     public static String sign_type = "RSA2";

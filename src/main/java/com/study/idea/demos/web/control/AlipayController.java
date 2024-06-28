@@ -32,11 +32,25 @@ public class AlipayController {
     AlipayService alipayService;
     @Autowired
     NameUtil nameUtil;
+    @RequestMapping("/free")
+    @ResponseBody
+    public StatusUtil.ErrorCode free(@RequestBody Order order){
+        StatusUtil.ErrorCode check=alipayService.checkOrder(order);
+        if(check!=StatusUtil.ErrorCode.OK)
+        {
+            return check;
+        }
+        alipayService.add(order);
+        return alipayService.pay(order);
+    }
     @RequestMapping("/pay")//支付
     public void pay(Order order, HttpServletResponse response) throws IOException {
         StatusUtil.ErrorCode check=alipayService.checkOrder(order);
         if(check!=StatusUtil.ErrorCode.OK)
         {
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(check.getMessage());
             return ;
         }
         alipayService.add(order);
@@ -47,6 +61,9 @@ public class AlipayController {
         user.setId(order.getUserId());
         String userName=nameUtil.ChangeIdToName(user);
         if(courseName==null||userName==null){
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(StatusUtil.ErrorCode.PARAMETER_ERROR.getMessage());
             return ;
         }
         AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.gatewayurl, AlipayConfig.app_id

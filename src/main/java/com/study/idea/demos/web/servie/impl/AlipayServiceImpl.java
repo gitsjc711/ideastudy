@@ -39,6 +39,14 @@ public class AlipayServiceImpl implements AlipayService {
         if(orderMapper.findByOrderNo(order.getOrderNo())!=null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
+        List<Order> list=orderMapper.findByUserId(order.getUserId());
+        if(list!=null) {
+            for (Order o : list) {
+                if (o.getCourseId() == order.getCourseId()) {
+                    return StatusUtil.ErrorCode.ALREADY_EXISTS;
+                }
+            }
+        }
         return StatusUtil.ErrorCode.OK;
     }
 
