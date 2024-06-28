@@ -7,6 +7,8 @@ import com.study.idea.demos.web.entity.VO.OrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class NameUtil {
     @Autowired
@@ -96,6 +98,22 @@ public class NameUtil {
         }else {
             return 0;
         }
+    }
+    public List<Integer> changeNickNameToId(User user){
+        List<User> dbUser;
+        if(user.getNickname()!=null){
+            dbUser = userMapper.findByNickname(user);
+            if(dbUser==null){
+                return null;
+            }else {
+                List<Integer> idList = new java.util.ArrayList<>();
+                for(User u:dbUser){
+                    idList.add(u.getId());
+                }
+                return idList;
+            }
+        }
+        return null;
     }
     public int changeNameToId(Category category){
         Category dbCategory;

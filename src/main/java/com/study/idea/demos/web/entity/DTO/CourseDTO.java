@@ -10,9 +10,8 @@ public class CourseDTO {
     int status;//0正常1禁用2待发布
     String name;
     String description;
-    String courseLogo;
     double price;
     int teacherId;
-    int categoryId;
+    String categoryName;
     MultipartFile file;
 }

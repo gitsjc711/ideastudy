@@ -30,50 +30,31 @@ public class CourseController {
     private UrlUtil urlUtil;
     @Autowired
     private CourseService courseService;
-    @RequestMapping("/add")
-    @ResponseBody
-    public StatusUtil.ErrorCode add(CourseDTO courseDTO){
-        Course course = courseService.changeToEntity(courseDTO);
-        if(!courseDTO.getFile().isEmpty()) {
-            String dirUrl = urlUtil.getUrl(courseDTO);
-            String writeUrl = dirUrl + "\\" + courseDTO.getFile().getOriginalFilename();
-            File dir=new File(dirUrl);
-            if(!dir.exists()){
-                dir.mkdirs();
-            }
-            File dest=new File(writeUrl);
-            course.setCourseLogo(writeUrl);
-            try {
-                courseDTO.getFile().transferTo(dest);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return courseService.insert(course);
-    }
     @RequestMapping("/publish")
     @ResponseBody
     public StatusUtil.ErrorCode publish(CourseDTO courseDTO){
         Course course = courseService.changeToEntity(courseDTO);
-        if(!courseDTO.getFile().isEmpty()){
-            String dirUrl = urlUtil.getUrl(courseDTO);
-            String writeUrl = dirUrl + "\\" + courseDTO.getFile().getOriginalFilename();
-            course.setCourseLogo(writeUrl);
-            File dir=new File(dirUrl);
-            if(!dir.exists()){
-                dir.mkdirs();
-            }
-            File dest=new File(writeUrl);
-            try {
-                courseDTO.getFile().transferTo(dest);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         StatusUtil.ErrorCode code= courseService.checkPram(course);
         if(code!=StatusUtil.ErrorCode.OK){
             return code;
         }
+        if(courseDTO.getFile()==null){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        String dirUrl = urlUtil.getUrl(courseDTO);
+        String writeUrl = dirUrl + "\\" + courseDTO.getFile().getOriginalFilename();
+        course.setCourseLogo(writeUrl);
+        File dir=new File(dirUrl);
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        File dest=new File(writeUrl);
+        try {
+            courseDTO.getFile().transferTo(dest);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        courseService.insert(course);
         return courseService.publish(course);
     }
     @RequestMapping("/findByCategory")
@@ -84,7 +65,11 @@ public class CourseController {
         }
         Category category = new Category();
         category.setCategoryName(categoryName);
-        category.setId(nameUtil.changeNameToId(category));
+        int categoryId = nameUtil.changeNameToId(category);
+        if(categoryId==0){
+            return null;
+        }
+        category.setId(categoryId);
         List<Course> list = courseService.findByCategoryId(category);
         User user = new User();
         user.setId(uid);
@@ -98,10 +83,20 @@ public class CourseController {
             return null;
         }
         User user = new User();
-        user.setAccount(teacherName);
-        user.setId(nameUtil.changeNameToId(user));
-        List<Course> list = courseService.findByTeacherId(user);
-        List<Course> lists = courseService.exceptBuy(list,user);
+        user.setNickname(teacherName);
+        List<Integer> userId=nameUtil.changeNickNameToId(user);
+        if(userId==null){
+            return null;
+        }
+        List<Course> list = new ArrayList<>();
+        for(Integer id:userId){
+            User teacher = new User();
+            teacher.setId(id);
+            list.addAll(courseService.findByTeacherId(teacher));
+        }
+        User student= new User();
+        student.setId(uid);
+        List<Course> lists = courseService.exceptBuy(list,student);
         return courseService.changeToVO(lists);
     }
     @RequestMapping("/findAll")
@@ -121,6 +116,15 @@ public class CourseController {
         List<Course> lists=courseService.onlyBuy(list,user);
         return courseService.changeToVO(lists);
 
+    }
+    @RequestMapping("/findMyTeach")
+    @ResponseBody
+    public List<CourseVO> findMyTeach(@RequestBody User user){
+        if (user.getId()==0){
+            return null;
+        }
+        List<Course> list =courseService.findByTeacherId(user);
+        return courseService.changeToVO(list);
     }
 
 }

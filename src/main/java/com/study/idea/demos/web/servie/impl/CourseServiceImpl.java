@@ -14,6 +14,7 @@ import com.study.idea.demos.web.servie.CourseService;
 import com.study.idea.demos.web.util.NameUtil;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.UrlUtil;
+import com.sun.org.apache.regexp.internal.RE;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,45 +37,22 @@ public class CourseServiceImpl implements CourseService {
     private OrderMapper orderMapper;
     @Autowired
     private UrlUtil urlUtil;
+    @Autowired
+    private NameUtil nameUtil;
+
+    @Override
+    public StatusUtil.ErrorCode checkPram(Course course){
+        if(course.getTeacherId()==0||course.getCategoryId()==0||course.getDescription()==null||course.getName()==null){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        return StatusUtil.ErrorCode.OK;
+    }
     @Override
     public Course findByName(Course course) {
         if(course.getName()==null){
             return null;
         }
         return courseMapper.findByName(course);
-    }
-    @Override
-    public StatusUtil.ErrorCode checkPram(Course course){
-        Course dbCourse = courseMapper.findByName(course);
-        if(dbCourse==null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        if(dbCourse.getCourseLogo()==null&&course.getCourseLogo()==null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }else if(course.getCourseLogo()==null){
-            course.setCourseLogo(dbCourse.getCourseLogo());
-        }else {
-            if(!dbCourse.getCourseLogo().equals(course.getCourseLogo())){
-                File file=new File(dbCourse.getCourseLogo());
-                if(file.exists()){
-                    file.delete();
-                }
-            }
-        }
-        if(dbCourse.getDescription()==null&&course.getDescription()==null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }else if(course.getDescription()==null){
-            course.setDescription(dbCourse.getDescription());
-        }
-        if(dbCourse.getCategoryId()==0&&course.getCategoryId()==0){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }else if(course.getCategoryId()==0){
-            course.setCategoryId(dbCourse.getCategoryId());
-        }
-        if(categoryMapper.findById(course.getCategoryId())==null){
-            return StatusUtil.ErrorCode.NOT_EXISTS;
-        }
-        return StatusUtil.ErrorCode.OK;
     }
     @Override
     public List<Course> findByCategoryId(Category category) {
@@ -208,7 +186,9 @@ public class CourseServiceImpl implements CourseService {
         course.setDescription(courseDTO.getDescription());
         course.setPrice(courseDTO.getPrice());
         course.setTeacherId(courseDTO.getTeacherId());
-        course.setCategoryId(courseDTO.getCategoryId());
+        Category category=new Category();
+        category.setCategoryName(courseDTO.getCategoryName());
+        course.setCategoryId(nameUtil.changeNameToId(category));
         return course;
     }
 

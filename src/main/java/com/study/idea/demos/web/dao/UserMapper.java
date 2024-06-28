@@ -6,12 +6,16 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
     @Select("select id,status,account,salt,password,nickname,email,role,user_avatar as userAvatar from user where account = #{account}")
     User findByAccount(User user);
     @Select("select id,status,account,salt,password,nickname,email,role,user_avatar as userAvatar from user where email = #{email}")
     User findByEmail(User user);
+    @Select("select id,status,account,salt,password,nickname,email,role,user_avatar as userAvatar from user where nickname = #{nickname}")
+    List<User> findByNickname(User user);
     @Select("select status,account,password,nickname,email,role,user_avatar as userAvatar from user where id=#{id}")
     User findById(int id);
     @Insert("insert into user(create_time,update_time,status,account,salt,password,nickname,email,role,user_avatar) " +
