@@ -101,18 +101,26 @@ public class CourseController {
         user.setAccount(teacherName);
         user.setId(nameUtil.changeNameToId(user));
         List<Course> list = courseService.findByTeacherId(user);
-        User user1 = new User();
-        user1.setId(uid);
-        List<Course> lists = courseService.exceptBuy(list,user1);
+        List<Course> lists = courseService.exceptBuy(list,user);
         return courseService.changeToVO(lists);
     }
     @RequestMapping("/findAll")
     @ResponseBody
     public List<CourseVO> findAll(@RequestBody User user){
-        if(user.getId()==0){
+        List<Course> list =courseService.findAll(user);
+        List<Course> lists=courseService.exceptBuy(list,user);
+        return courseService.changeToVO(lists);
+    }
+    @RequestMapping("/findMyCourse")
+    @ResponseBody
+    public List<CourseVO> findMyCourse(@RequestBody User user){
+        if (user.getId()==0){
             return null;
         }
-        return courseService.changeToVO(courseService.findAll(user));
+        List<Course> list =courseService.findAll(user);
+        List<Course> lists=courseService.onlyBuy(list,user);
+        return courseService.changeToVO(lists);
+
     }
 
 }

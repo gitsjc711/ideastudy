@@ -110,17 +110,11 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<Course> findAll(User user){
         List<Course> list=courseMapper.findAll();
-        List<Order> orders=orderMapper.findByUserId(user.getId());
         Iterator<Course> iterator=list.iterator();
         while(iterator.hasNext()){
             Course i = iterator.next();
             if(i.getStatus() == 1){
                 iterator.remove();
-            }
-            for(Order order:orders){
-                if(order.getCourseId()==i.getId()){
-                    iterator.remove();
-                }
             }
         }
         return list;
@@ -142,6 +136,25 @@ public class CourseServiceImpl implements CourseService {
         }
         return list;
     }
+    @Override
+    public List<Course> onlyBuy(List<Course> list,User user){
+        if(list==null){
+            return null;
+        }
+        List<Order> orders=orderMapper.findByUserId(user.getId());
+        Iterator<Course> iterator=list.iterator();
+        List<Course> result=new ArrayList<>();
+        while(iterator.hasNext()){
+            Course i = iterator.next();
+            for(Order order:orders){
+                if(order.getCourseId()==i.getId()){
+                    result.add(i);
+                }
+            }
+        }
+        return result;
+    }
+
 
     @Override
     public StatusUtil.ErrorCode insert(Course course) {

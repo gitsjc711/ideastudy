@@ -7,21 +7,18 @@ import com.study.idea.demos.web.servie.UserService;
 import com.study.idea.demos.web.util.RedisUtil;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.UrlUtil;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
-
 @Controller
 public class UserController {
     @Autowired
@@ -38,7 +35,8 @@ public class UserController {
     @ResponseBody
     public StatusUtil.ErrorCode login(@RequestBody User user)//登录
     {
-        return userService.checkLogin(user);
+        StatusUtil.ErrorCode errorCode= userService.checkLogin(user);
+        return errorCode;
     }
     @RequestMapping("/register")
     @ResponseBody

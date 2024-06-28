@@ -14,6 +14,7 @@ public class RedisUtil {
     @Autowired
     private RedisTemplate<String, Serializable> serializableRedisTemplate;
     private long default_time=300;
+    private long login_time=60*60*24*7;
     public Object get(String key) {
         return key == null ? null : serializableRedisTemplate.opsForValue().get(key);
     }
@@ -28,6 +29,16 @@ public class RedisUtil {
     public boolean set(String key, Serializable value) {
         try {
             serializableRedisTemplate.opsForValue().set(key, value, default_time, TimeUnit.SECONDS);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+    public boolean loginSet(String key, Serializable value) {
+        try {
+            serializableRedisTemplate.opsForValue().set(key, value, login_time, TimeUnit.SECONDS);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
