@@ -135,7 +135,6 @@ public class AlipayController {
                 user.setAccount(userName);
                 order.setUserId(nameUtil.changeNameToId(user));
                 order.setActualPrice(Double.parseDouble(actualPrice));
-                alipayService.add(order);
                 if(alipayService.pay(order)== StatusUtil.ErrorCode.OK){
                     System.out.println("交易成功");
                 }else{
