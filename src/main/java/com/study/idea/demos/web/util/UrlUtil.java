@@ -6,9 +6,9 @@ import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.DTO.CourseDTO;
 import com.study.idea.demos.web.entity.DTO.ResourceDTO;
 import com.study.idea.demos.web.entity.DTO.UserDTO;
-import com.study.idea.demos.web.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class UrlUtil {
@@ -46,6 +46,16 @@ public class UrlUtil {
         url=avatarPath+"\\"+userDTO.getAccount();
         return url;
     }
+    public String getUrl(MultipartFile file){
+        String url="";
+        if(file.getContentType().equals("image/png")){
+            url=imagePath;
+        }else{
+            url=videoPath;
+        }
+        return url;
+    }
+
     public String changeToRequestUrl(String url){
         String requestUrl=url.replace("G:\\resource\\", WebConfig.basePath).replace("\\","/");
 

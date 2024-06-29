@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,25 +35,20 @@ public class CourseController {
     @ResponseBody
     public StatusUtil.ErrorCode publish(CourseDTO courseDTO){
         Course course = courseService.changeToEntity(courseDTO);
+        Category category = new Category();
+        category.setCategoryName(courseDTO.getCategory());
+        int categoryId=nameUtil.changeNameToId(category);
+        if(categoryId==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        course.setCategoryId(categoryId);
+        course.setCourseLogo(courseDTO.getImageUrl());
         StatusUtil.ErrorCode code= courseService.checkPram(course);
         if(code!=StatusUtil.ErrorCode.OK){
             return code;
         }
-        if(courseDTO.getFile()==null){
+        if(courseDTO.getImageUrl()==null) {
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        String dirUrl = urlUtil.getUrl(courseDTO);
-        String writeUrl = dirUrl + "\\" + courseDTO.getFile().getOriginalFilename();
-        course.setCourseLogo(writeUrl);
-        File dir=new File(dirUrl);
-        if(!dir.exists()){
-            dir.mkdirs();
-        }
-        File dest=new File(writeUrl);
-        try {
-            courseDTO.getFile().transferTo(dest);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
         courseService.insert(course);
         return courseService.publish(course);

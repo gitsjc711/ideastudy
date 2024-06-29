@@ -14,12 +14,10 @@ import com.study.idea.demos.web.servie.CourseService;
 import com.study.idea.demos.web.util.NameUtil;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.UrlUtil;
-import com.sun.org.apache.regexp.internal.RE;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -42,7 +40,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public StatusUtil.ErrorCode checkPram(Course course){
-        if(course.getTeacherId()==0||course.getCategoryId()==0||course.getDescription()==null||course.getName()==null){
+        if(course.getTeacherId()==0||course.getDescription()==null||course.getName()==null||course.getCourseLogo()==null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
         return StatusUtil.ErrorCode.OK;
@@ -184,10 +182,14 @@ public class CourseServiceImpl implements CourseService {
         Course course = new Course();
         course.setName(courseDTO.getName());
         course.setDescription(courseDTO.getDescription());
-        course.setPrice(courseDTO.getPrice());
+        double price = Double.parseDouble(courseDTO.getPrice());
+        BigDecimal bg = new BigDecimal(price);
+        double f1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        course.setPrice(f1);
         course.setTeacherId(courseDTO.getTeacherId());
         Category category=new Category();
-        category.setCategoryName(courseDTO.getCategoryName());
+
+        category.setCategoryName(courseDTO.getCategory());
         course.setCategoryId(nameUtil.changeNameToId(category));
         return course;
     }
