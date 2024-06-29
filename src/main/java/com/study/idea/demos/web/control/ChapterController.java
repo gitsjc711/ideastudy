@@ -2,6 +2,7 @@ package com.study.idea.demos.web.control;
 
 import com.study.idea.demos.web.entity.Chapter;
 import com.study.idea.demos.web.entity.Course;
+import com.study.idea.demos.web.entity.VO.ChapterVO;
 import com.study.idea.demos.web.servie.ChapterService;
 import com.study.idea.demos.web.util.StatusUtil;
 import org.checkerframework.checker.units.qual.C;
@@ -25,8 +26,9 @@ public class ChapterController {
     }
     @RequestMapping("/findChapter")
     @ResponseBody
-    public List<Chapter> findChapter(@RequestBody Course course) {
-        return chapterService.findByCourseId(course);
+    public List<ChapterVO> findChapter(@RequestBody Course course) {
+        List<Chapter> list=chapterService.findByCourseId(course);
+        return chapterService.changeToVO(list);
     }
     @RequestMapping("/update")
     @ResponseBody

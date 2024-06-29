@@ -79,19 +79,16 @@ public class ResourceServiceImpl implements ResourceService {
         return StatusUtil.ErrorCode.OK;
     }
     public List<ResourceVO> changeToVO(List<Resource> resources){
+        if(resources==null){
+            return null;
+        }
         List<ResourceVO> result=new ArrayList<>();
-        for(Resource resource:resources){
+        for(Resource i:resources){
             ResourceVO resourceVO=new ResourceVO();
-            resourceVO.setId(resource.getId());
-            resourceVO.setStatus(resource.getStatus());
-            resourceVO.setName(resource.getName());
-            resourceVO.setType(resource.getType());
-            resourceVO.setUrl(resource.getUrl());
-            Chapter chapter=chapterMapper.findById(resource.getChapterId());
-            Course course=courseMapper.findById(chapter.getCourseId());
-            resourceVO.setChapterName(chapter.getName());
-            resourceVO.setCourseName(course.getName());
-            resourceVO.setRequestUrl(urlUtil.changeToRequestUrl(resource.getUrl()));
+            resourceVO.setId(i.getId());
+            resourceVO.setLabel(i.getName());
+            resourceVO.setType(i.getType());
+            resourceVO.setUrl(urlUtil.changeToRequestUrl(i.getUrl()));
             result.add(resourceVO);
         }
         return result;

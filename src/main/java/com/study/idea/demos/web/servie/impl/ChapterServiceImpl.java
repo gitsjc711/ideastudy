@@ -2,13 +2,19 @@ package com.study.idea.demos.web.servie.impl;
 
 import com.study.idea.demos.web.dao.ChapterMapper;
 import com.study.idea.demos.web.dao.CourseMapper;
+import com.study.idea.demos.web.dao.ResourceMapper;
 import com.study.idea.demos.web.entity.Chapter;
 import com.study.idea.demos.web.entity.Course;
+import com.study.idea.demos.web.entity.Resource;
+import com.study.idea.demos.web.entity.VO.ChapterVO;
+import com.study.idea.demos.web.entity.VO.ResourceVO;
 import com.study.idea.demos.web.servie.ChapterService;
 import com.study.idea.demos.web.util.StatusUtil;
+import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +25,10 @@ public class ChapterServiceImpl implements ChapterService {
     private ChapterMapper chapterMapper;
     @Autowired
     private CourseMapper courseMapper;
+    @Autowired
+    private ResourceMapper resourceMapper;
+    @Autowired
+    private UrlUtil urlUtil;
     @Override
     public List<Chapter> findByCourseId(Course course) {
         if(course.getId()== 0){
@@ -74,5 +84,39 @@ public class ChapterServiceImpl implements ChapterService {
         } else {
             return StatusUtil.ErrorCode.UNKNOWN_ERROR;
         }
+    }
+    @Override
+    public List<ChapterVO> changeToVO(List<Chapter> chapters){
+        if(chapters==null) {
+            return null;
+        }
+        List<ChapterVO> list=new ArrayList<ChapterVO>();
+        for(Chapter i:chapters){
+            if(i.getStatus()!=1){
+                ChapterVO chapterVO=new ChapterVO();
+                chapterVO.setId(i.getId());
+                chapterVO.setLabel(i.getName());
+                chapterVO.setChapterOrder(i.getChapterOrder());
+                List<Resource> resources=resourceMapper.findByChapterId(i.getId());
+                if(resources!=null){
+                    List<ResourceVO> resourceVOS=new ArrayList<ResourceVO>();
+                    for(Resource j:resources){
+                        if(j.getStatus()!=1){
+                            ResourceVO resourceVO=new ResourceVO();
+                            resourceVO.setId(j.getId());
+                            resourceVO.setLabel(j.getName());
+                            resourceVO.setType(j.getType());
+                            resourceVO.setUrl(urlUtil.changeToRequestUrl(j.getUrl()));
+                            resourceVOS.add(resourceVO);
+                        }
+                    }
+                    chapterVO.setChildren(resourceVOS);
+                }else{
+                    chapterVO.setChildren(null);
+                }
+                list.add(chapterVO);
+            }
+        }
+        return list;
     }
 }

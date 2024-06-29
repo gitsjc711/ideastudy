@@ -8,13 +8,7 @@ import java.util.Date;
 @Data
 public class ResourceVO {
     int id;
-    Date createTime;
-    Date updateTime;
-    int status;//0正常1禁用
-    String name;
+    String label;
     String type;
     String url;
-    String courseName;
-    String chapterName;
-    String requestUrl;
 }
