@@ -48,7 +48,7 @@ public class UrlUtil {
     }
     public String getUrl(MultipartFile file){
         String url="";
-        if(file.getContentType().equals("image/png")){
+        if(file.getContentType().equals("image/png")||file.getContentType().equals("image/jpeg")||file.getContentType().equals("image/gif")||file.getContentType().equals("image/jpg")){
             url=imagePath;
         }else{
             url=videoPath;

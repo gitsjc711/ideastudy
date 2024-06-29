@@ -13,5 +13,4 @@ public class ResourceDTO {
     String url;
     int courseId;
     int chapterId;
-    MultipartFile file;
 }

@@ -57,19 +57,6 @@ public class UserController {
         String code = String.valueOf(object);
         if(userDTO.getCode().equals(code)) {//验证码正确
             redisUtil.delete(user.getEmail());
-            String dirUrl=urlUtil.getUrl(userDTO);
-            String writeUrl=dirUrl+"\\"+userDTO.getAvatar().getOriginalFilename();
-            user.setUserAvatar(writeUrl);
-            File dir=new File(dirUrl);
-            if(!dir.exists()){
-                dir.mkdirs();
-            }
-            File dest=new File(writeUrl);
-            try {
-                userDTO.getAvatar().transferTo(dest);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
             return userService.register(user);
         }else{
             return StatusUtil.ErrorCode.PARAMETER_ERROR;

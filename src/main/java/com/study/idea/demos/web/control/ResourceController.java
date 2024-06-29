@@ -33,30 +33,14 @@ public class ResourceController {
     @RequestMapping("/add")
     @ResponseBody
     public StatusUtil.ErrorCode add(ResourceDTO resourceDTO) {
-        if(resourceDTO.getFile()==null||resourceDTO.getCourseId()==0){
+        if(resourceDTO.getUrl()==null||resourceDTO.getCourseId()==0){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
         Resource resource = new Resource();
         resource.setChapterId(resourceDTO.getChapterId());
         resource.setName(resourceDTO.getName());
         resource.setType(resourceDTO.getType());
-        String url = urlUtil.getUrl(resourceDTO);
-        String writeUrl=url+"\\"+resourceDTO.getFile().getOriginalFilename();
-        StatusUtil.ErrorCode code=resourceService.checkPram(resource,resourceDTO.getCourseId(),writeUrl);
-        if(code!=StatusUtil.ErrorCode.OK){
-            return code;
-        }
-        File dir=new File(url);
-        if(!dir.exists()){
-            dir.mkdirs();
-        }
-        resource.setUrl(writeUrl);
-        File dest=new File(writeUrl);
-        try {
-            resourceDTO.getFile().transferTo(dest);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        resource.setUrl(resourceDTO.getUrl());
         return resourceService.insert(resource);
     }
 

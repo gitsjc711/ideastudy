@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private UrlUtil urlUtil;
     @Override
     public StatusUtil.ErrorCode checkPram(User user){
-        if(user == null|| user.getAccount() == null|| user.getPassword() == null||user.getEmail()==null){
+        if(user == null|| user.getAccount() == null|| user.getPassword() == null||user.getEmail()==null||user.getUserAvatar()==null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
         User dbUser=userMapper.findByAccount(user);
@@ -130,14 +130,14 @@ public class UserServiceImpl implements UserService {
         user.setNickname(userDTO.getNickname());
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
-        switch (userDTO.getRole()){
-            case "student":
-                user.setRole(1);
-                break;
-            case "teacher":
-                user.setRole(2);
-                break;
+        if(userDTO.getRole().equals(",student")){
+            user.setRole(1);
+        }else if(userDTO.getRole().equals(",teacher")){
+            user.setRole(2);
+        }else{
+            user.setRole(0);
         }
+        user.setUserAvatar(userDTO.getAvatar());
         return user;
     }
     public UserVO changeToVO(User user){
