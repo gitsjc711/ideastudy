@@ -43,6 +43,29 @@ public class ResourceServiceImpl implements ResourceService {
         }
         return lists;
     }
+    @Override
+    public List<Resource> findByCourseId(Course course){
+        if(course.getId()==0){
+            return null;
+        }
+        List<Chapter> list = chapterMapper.findByCourseId(course.getId());
+        if(list==null){
+            return null;
+        }
+        List<Resource> lists = new ArrayList<>();
+        for(Chapter i:list){
+            List<Resource> list1 = resourceMapper.findByChapterId(i.getId());
+            lists.addAll(list1);
+        }
+        Iterator<Resource> iterator=lists.iterator();
+        while(iterator.hasNext()){
+            Resource i = iterator.next();
+            if(i.getStatus() == 1){
+                iterator.remove();
+            }
+        }
+        return lists;
+    }
 
     @Override
     public StatusUtil.ErrorCode insert(Resource resource) {

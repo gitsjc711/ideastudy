@@ -30,4 +30,10 @@ public class NoticeController {
         List<Notice> list=noticeService.findByUserId(user);
         return noticeService.changeToVO(list);
     }
+    @RequestMapping("/findNoticeByCourse")
+    @ResponseBody
+    public List<NoticeVO> findNoticeByCourse(@RequestBody Course course) {
+        List<Notice> list=noticeService.findByCourseId(course);
+        return noticeService.changeToVO(list);
+    }
 }

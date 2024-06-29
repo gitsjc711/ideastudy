@@ -1,6 +1,7 @@
 package com.study.idea.demos.web.control;
 
 import com.study.idea.demos.web.entity.Chapter;
+import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.DTO.ResourceDTO;
 import com.study.idea.demos.web.entity.Resource;
 import com.study.idea.demos.web.entity.VO.ResourceVO;
@@ -28,6 +29,12 @@ public class ResourceController {
     @ResponseBody
     public List<ResourceVO> findResource(@RequestBody Chapter chapter) {
         List<Resource> lists= resourceService.findByChapterId(chapter);
+        return resourceService.changeToVO(lists);
+    }
+    @RequestMapping("/findResourceByCourse")
+    @ResponseBody
+    public List<ResourceVO> findResourceByCourse(@RequestBody Course course) {
+        List<Resource> lists= resourceService.findByCourseId(course);
         return resourceService.changeToVO(lists);
     }
     @RequestMapping("/add")

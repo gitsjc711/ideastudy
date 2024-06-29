@@ -45,6 +45,14 @@ public class NoticeServiceImpl implements NoticeService{
         }
         return resultList;
     }
+    @Override
+    public List<Notice> findByCourseId(Course course){
+        if(course.getId()==0){
+            return null;
+        }
+        return noticeMapper.findByCourseId(course.getId());
+    }
+
 
     @Override
     public StatusUtil.ErrorCode insert(Notice notice) {

@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface NoticeService {
     List<Notice> findByUserId(User user);
+    List<Notice> findByCourseId(Course course);
     StatusUtil.ErrorCode insert(Notice notice);
     List<NoticeVO> changeToVO(List<Notice> notices);
 
