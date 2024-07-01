@@ -7,15 +7,12 @@ import com.study.idea.demos.web.entity.Resource;
 import com.study.idea.demos.web.entity.VO.ResourceVO;
 import com.study.idea.demos.web.servie.ResourceService;
 import com.study.idea.demos.web.util.StatusUtil;
-import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -23,8 +20,6 @@ import java.util.List;
 public class ResourceController {
     @Autowired
     private ResourceService resourceService;
-    @Autowired
-    private UrlUtil urlUtil;
     @RequestMapping("/findResource")
     @ResponseBody
     public List<ResourceVO> findResource(@RequestBody Chapter chapter) {
@@ -40,14 +35,11 @@ public class ResourceController {
     @RequestMapping("/add")
     @ResponseBody
     public StatusUtil.ErrorCode add(ResourceDTO resourceDTO) {
-        if(resourceDTO.getUrl()==null||resourceDTO.getCourseId()==0){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        StatusUtil.ErrorCode errorCode = resourceService.checkPram(resourceDTO);
+        if(errorCode!=StatusUtil.ErrorCode.OK){
+            return errorCode;
         }
-        Resource resource = new Resource();
-        resource.setChapterId(resourceDTO.getChapterId());
-        resource.setName(resourceDTO.getName());
-        resource.setType(resourceDTO.getType());
-        resource.setUrl(resourceDTO.getUrl());
+        Resource resource = resourceService.changeToEntity(resourceDTO);
         return resourceService.insert(resource);
     }
 

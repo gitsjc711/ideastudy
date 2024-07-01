@@ -6,11 +6,13 @@ import com.study.idea.demos.web.dao.CourseMapper;
 import com.study.idea.demos.web.dao.ResourceMapper;
 import com.study.idea.demos.web.entity.Chapter;
 import com.study.idea.demos.web.entity.Course;
+import com.study.idea.demos.web.entity.DTO.ResourceDTO;
 import com.study.idea.demos.web.entity.Resource;
 import com.study.idea.demos.web.entity.VO.ResourceVO;
 import com.study.idea.demos.web.servie.ResourceService;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.UrlUtil;
+import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -80,23 +82,28 @@ public class ResourceServiceImpl implements ResourceService {
         }
     }
     @Override
-    public StatusUtil.ErrorCode checkPram(Resource resource,int courseId,String url){
-        if (resource.getChapterId() == 0 || resource.getType() == null || resource.getName() == null) {
+    public StatusUtil.ErrorCode checkPram(ResourceDTO resourceDTO){
+        if (resourceDTO.getChapterOrder() == 0 || resourceDTO.getType() == null || resourceDTO.getName() == null||resourceDTO.getUrl()==null||resourceDTO.getCourseId()==0) {
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
-        Resource dbResource= resourceMapper.findByUrl(url);
-        if(dbResource!=null){
-            return StatusUtil.ErrorCode.ALREADY_EXISTS;
-        }
-        Chapter chapter= chapterMapper.findById(resource.getChapterId());
-        if(chapter==null){
+        Resource resource = new Resource();
+        Course course = new Course();
+        course.setId(resourceDTO.getCourseId());
+        Course dbCourse=courseMapper.findById(course.getId());
+        if(dbCourse==null){
             return StatusUtil.ErrorCode.NOT_EXISTS;
         }
-        Course course=courseMapper.findById(courseId);
-        if(course==null){
+        List<Chapter> chapterList=chapterMapper.findByCourseId(course.getId());
+        if(chapterList==null){
             return StatusUtil.ErrorCode.NOT_EXISTS;
         }
-        if(chapter.getCourseId()!=courseId){
+        for(Chapter i:chapterList){
+            if(i.getChapterOrder()==resourceDTO.getChapterOrder()){
+                resource.setChapterId(i.getId());
+                break;
+            }
+        }
+        if(resource.getChapterId()==0){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
         return StatusUtil.ErrorCode.OK;
@@ -116,5 +123,24 @@ public class ResourceServiceImpl implements ResourceService {
         }
         return result;
     }
+    public Resource changeToEntity(ResourceDTO resourceDTO){
+        if(resourceDTO==null){
+            return null;
+        }
+        Course course=new Course();
+        course.setId(resourceDTO.getCourseId());
 
+        List<Chapter> chapterList=chapterMapper.findByCourseId(course.getId());
+        Resource resource=new Resource();
+        for(Chapter j:chapterList){
+            if(j.getChapterOrder()==resourceDTO.getChapterOrder()){
+                resource.setChapterId(j.getId());
+                break;
+            }
+        }
+        resource.setName(resourceDTO.getName());
+        resource.setType(resourceDTO.getType());
+        resource.setUrl(resourceDTO.getUrl());
+        return resource;
+    }
 }

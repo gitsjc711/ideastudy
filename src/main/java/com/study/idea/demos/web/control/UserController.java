@@ -12,12 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 @Controller
 public class UserController {
@@ -35,8 +33,7 @@ public class UserController {
     @ResponseBody
     public StatusUtil.ErrorCode login(@RequestBody User user)//登录
     {
-        StatusUtil.ErrorCode errorCode= userService.checkLogin(user);
-        return errorCode;
+        return userService.checkLogin(user);
     }
     @RequestMapping("/register")
     @ResponseBody

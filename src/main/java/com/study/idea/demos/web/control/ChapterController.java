@@ -5,7 +5,6 @@ import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.VO.ChapterVO;
 import com.study.idea.demos.web.servie.ChapterService;
 import com.study.idea.demos.web.util.StatusUtil;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;

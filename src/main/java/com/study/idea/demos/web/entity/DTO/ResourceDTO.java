@@ -12,5 +12,5 @@ public class ResourceDTO {
     String type;
     String url;
     int courseId;
-    int chapterId;
+    int chapterOrder;
 }
