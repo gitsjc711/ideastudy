@@ -1,6 +1,7 @@
 package com.study.idea.demos.web.control;
 
 import com.study.idea.demos.web.entity.Homework;
+import com.study.idea.demos.web.entity.HomeworkStudent;
 import com.study.idea.demos.web.servie.HomeworkService;
 import com.study.idea.demos.web.util.StatusUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @Controller
@@ -33,4 +37,28 @@ public class HomeworkController {
     {
         return homeworkService.findByClassId(homework);
     }
+    @RequestMapping("/finish")
+    @ResponseBody
+    public StatusUtil.ErrorCode finish(@RequestBody HomeworkStudent homeworkStudent) throws Exception
+    {
+        StatusUtil.ErrorCode errorCode = homeworkService.checkParams(homeworkStudent);
+        if(errorCode != StatusUtil.ErrorCode.OK)
+        {
+            return errorCode;
+        }
+        Path path = new File(homeworkStudent.getHomeworkUrl()).toPath();
+        String mimeType = Files.probeContentType(path);
+        homeworkStudent.setHomeworkType(mimeType);
+        return homeworkService.insert(homeworkStudent);
+    }
+    @RequestMapping("/findStatus")
+    @ResponseBody
+    public boolean findSatus(@RequestBody HomeworkStudent homeworkStudent)
+    {
+        if(homeworkStudent.getUserId() == 0|| homeworkStudent.getHomeworkId() == 0){
+            return false;
+        }
+        return homeworkService.findFinishStatus(homeworkStudent);
+    }
+
 }

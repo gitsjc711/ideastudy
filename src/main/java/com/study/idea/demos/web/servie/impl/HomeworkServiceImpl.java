@@ -3,9 +3,10 @@ package com.study.idea.demos.web.servie.impl;
 import com.study.idea.demos.web.dao.ChapterMapper;
 import com.study.idea.demos.web.dao.CourseMapper;
 import com.study.idea.demos.web.dao.HomeworkMapper;
+import com.study.idea.demos.web.dao.UserMapper;
 import com.study.idea.demos.web.entity.Chapter;
-import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.Homework;
+import com.study.idea.demos.web.entity.HomeworkStudent;
 import com.study.idea.demos.web.servie.HomeworkService;
 import com.study.idea.demos.web.util.StatusUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ public class HomeworkServiceImpl implements HomeworkService {
     private ChapterMapper chapterMapper;
     @Autowired
     private CourseMapper courseMapper;
+    @Autowired
+    private UserMapper userMapper;
     @Override
     public StatusUtil.ErrorCode checkParams(Homework homework){
         if(homework.getCourseId()==0||homework.getChapterOrder()==0||homework.getName()==null||homework.getDescription()==null){
@@ -44,6 +47,19 @@ public class HomeworkServiceImpl implements HomeworkService {
         return StatusUtil.ErrorCode.OK;
     }
     @Override
+    public StatusUtil.ErrorCode checkParams(HomeworkStudent homeworkStudent){
+        if(homeworkStudent.getHomeworkId()==0||homeworkStudent.getUserId()==0||homeworkStudent.getHomeworkUrl()==null){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        if(homeworkMapper.findById(homeworkStudent.getHomeworkId())==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        if(userMapper.findById(homeworkStudent.getUserId())==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        return StatusUtil.ErrorCode.OK;
+    }
+    @Override
     public List<Homework> findByClassId(Homework homework) {
         if(homework.getCourseId()==0){
             return null;
@@ -58,6 +74,19 @@ public class HomeworkServiceImpl implements HomeworkService {
         }
         return lists;
     }
+    @Override
+    public boolean findFinishStatus(HomeworkStudent homeworkStudent){
+        List<HomeworkStudent> lists=homeworkMapper.findByHomeworkId(homeworkStudent.getHomeworkId());
+        if(lists==null){
+            return false;
+        }
+        for(HomeworkStudent i:lists){
+            if(i.getUserId()==homeworkStudent.getUserId()){
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public StatusUtil.ErrorCode insert(Homework homework) {
@@ -66,6 +95,18 @@ public class HomeworkServiceImpl implements HomeworkService {
         homework.setUpdateTime(date);
         homework.setStatus(0);
         if(homeworkMapper.insert(homework)){
+            return StatusUtil.ErrorCode.OK;
+        }else{
+            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+        }
+    }
+    @Override
+    public StatusUtil.ErrorCode insert(HomeworkStudent homeworkStudent){
+        Date date = new Date();
+        homeworkStudent.setCreateTime(date);
+        homeworkStudent.setUpdateTime(date);
+        homeworkStudent.setStatus(0);
+        if(homeworkMapper.insertFinishHomework(homeworkStudent)){
             return StatusUtil.ErrorCode.OK;
         }else{
             return StatusUtil.ErrorCode.UNKNOWN_ERROR;
