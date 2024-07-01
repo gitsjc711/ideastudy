@@ -36,16 +36,6 @@ public class RedisUtil {
         }
 
     }
-    public boolean loginSet(String key, Serializable value) {
-        try {
-            serializableRedisTemplate.opsForValue().set(key, value, login_time, TimeUnit.SECONDS);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
-    }
     public boolean delete(String key) {
         try {
             serializableRedisTemplate.delete(key);
