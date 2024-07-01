@@ -83,7 +83,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
     @Override
     public StatusUtil.ErrorCode checkPram(ResourceDTO resourceDTO){
-        if (resourceDTO.getChapterOrder() == 0 || resourceDTO.getType() == null || resourceDTO.getName() == null||resourceDTO.getUrl()==null||resourceDTO.getCourseId()==0) {
+        if (resourceDTO.getChapterOrder() == 0 || resourceDTO.getName() == null||resourceDTO.getUrl()==null||resourceDTO.getCourseId()==0) {
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
         Resource resource = new Resource();

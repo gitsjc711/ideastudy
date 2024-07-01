@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @Controller
@@ -34,11 +37,14 @@ public class ResourceController {
     }
     @RequestMapping("/add")
     @ResponseBody
-    public StatusUtil.ErrorCode add(ResourceDTO resourceDTO) {
+    public StatusUtil.ErrorCode add(@RequestBody ResourceDTO resourceDTO) throws Exception {
         StatusUtil.ErrorCode errorCode = resourceService.checkPram(resourceDTO);
         if(errorCode!=StatusUtil.ErrorCode.OK){
             return errorCode;
         }
+        Path path = new File(resourceDTO.getUrl()).toPath();
+        String mimeType = Files.probeContentType(path);
+        resourceDTO.setType(mimeType);
         Resource resource = resourceService.changeToEntity(resourceDTO);
         return resourceService.insert(resource);
     }
