@@ -21,12 +21,34 @@ public class HomeworkServiceImpl implements HomeworkService {
     private HomeworkMapper homeworkMapper;
     @Autowired
     private ChapterMapper chapterMapper;
+    @Autowired
+    private CourseMapper courseMapper;
     @Override
-    public List<Homework> findByClassIdAndChapterOrder(Homework homework) {
-        if(homework.getChapterOrder()==0||homework.getCourseId()==0){
+    public StatusUtil.ErrorCode checkParams(Homework homework){
+        if(homework.getCourseId()==0||homework.getChapterOrder()==0||homework.getName()==null||homework.getDescription()==null){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        if(courseMapper.findById(homework.getCourseId())==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        List<Chapter> dbChapter=chapterMapper.findByCourseId(homework.getCourseId());
+        boolean flag=false;
+        for(Chapter it:dbChapter){
+            if(it.getChapterOrder()==homework.getChapterOrder()){
+                flag=true;
+            }
+        }
+        if(!flag){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        return StatusUtil.ErrorCode.OK;
+    }
+    @Override
+    public List<Homework> findByClassId(Homework homework) {
+        if(homework.getCourseId()==0){
             return null;
         }
-        List<Homework> lists=homeworkMapper.findByClassIdAndChapterOrder(homework.getCourseId(),homework.getChapterOrder());
+        List<Homework> lists=homeworkMapper.findByCourseId(homework.getCourseId());
         Iterator<Homework> iterator=lists.iterator();
         while(iterator.hasNext()){
             Homework i = iterator.next();
@@ -39,19 +61,6 @@ public class HomeworkServiceImpl implements HomeworkService {
 
     @Override
     public StatusUtil.ErrorCode insert(Homework homework) {
-        if(homework.getCourseId()==0||homework.getChapterOrder()==0||homework.getName()==null||homework.getDescription()==null){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        List<Chapter> dbChapter=chapterMapper.findByCourseId(homework.getCourseId());
-        boolean flag=false;
-        for(Chapter it:dbChapter){
-            if(it.getChapterOrder()==homework.getChapterOrder()){
-                flag=true;
-            }
-        }
-        if(!flag){
-            return StatusUtil.ErrorCode.NOT_EXISTS;
-        }
         Date date = new Date();
         homework.setCreateTime(date);
         homework.setUpdateTime(date);

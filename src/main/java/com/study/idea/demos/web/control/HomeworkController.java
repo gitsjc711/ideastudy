@@ -20,12 +20,17 @@ public class HomeworkController {
     @ResponseBody
     public StatusUtil.ErrorCode add(@RequestBody Homework homework)
     {
+        StatusUtil.ErrorCode errorCode = homeworkService.checkParams(homework);
+            if(errorCode != StatusUtil.ErrorCode.OK)
+        {
+            return errorCode;
+        }
         return homeworkService.insert(homework);
     }
     @RequestMapping("/findHomework")
     @ResponseBody
     public List<Homework> findHomework(@RequestBody Homework homework)
     {
-        return homeworkService.findByClassIdAndChapterOrder(homework);
+        return homeworkService.findByClassId(homework);
     }
 }

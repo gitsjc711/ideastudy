@@ -10,8 +10,9 @@ import java.util.List;
 
 @Mapper
 public interface HomeworkMapper {
-    @Select("select id,status,name,description,course_id as courseId, chapter_order as chapterOrder from homework where course_id=#{courseId} and chapter_order=#{chapterOrder}")
-    List<Homework> findByClassIdAndChapterOrder(@Param("courseId") int courseId,@Param("chapterOrder") int chapterOrder);
+
+    @Select("select id,status,name,description,course_id as courseId, chapter_order as chapterOrder from homework where course_id=#{courseId}")
+    List<Homework> findByCourseId(int courseId);
     @Insert("insert into homework(create_time, update_time, status, name, description, course_id, chapter_order) " +
             "values (#{createTime},#{updateTime},#{status},#{name},#{description},#{courseId},#{chapterOrder})")
     boolean insert(Homework homework);
