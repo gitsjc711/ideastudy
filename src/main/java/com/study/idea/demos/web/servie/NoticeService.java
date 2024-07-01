@@ -9,6 +9,7 @@ import com.study.idea.demos.web.util.StatusUtil;
 import java.util.List;
 
 public interface NoticeService {
+    StatusUtil.ErrorCode checkParams(Notice notice);
     List<Notice> findByUserId(User user);
     List<Notice> findByCourseId(Course course);
     StatusUtil.ErrorCode insert(Notice notice);

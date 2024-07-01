@@ -22,6 +22,10 @@ public class NoticeController {
     @RequestMapping("/add")
     @ResponseBody
     public StatusUtil.ErrorCode add(@RequestBody Notice notice) {
+        StatusUtil.ErrorCode errorCode=noticeService.checkParams(notice);
+        if(errorCode!=StatusUtil.ErrorCode.OK) {
+            return errorCode;
+        }
         return noticeService.insert(notice);
     }
     @RequestMapping("/findNotice")

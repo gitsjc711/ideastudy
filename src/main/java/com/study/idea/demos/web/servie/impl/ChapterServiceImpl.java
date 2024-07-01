@@ -30,6 +30,24 @@ public class ChapterServiceImpl implements ChapterService {
     @Autowired
     private UrlUtil urlUtil;
     @Override
+    public StatusUtil.ErrorCode checkParams(Chapter chapter){
+        if(chapter.getChapterOrder()==0||chapter.getName()==null||chapter.getCourseId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        if(courseMapper.findById(chapter.getCourseId())==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        List<Chapter> chapters= chapterMapper.findByCourseId(chapter.getCourseId());
+        if(chapters!=null) {
+            for (Chapter it : chapters) {
+                if (it.getChapterOrder() == chapter.getChapterOrder()) {
+                    return StatusUtil.ErrorCode.ALREADY_EXISTS;
+                }
+            }
+        }
+        return StatusUtil.ErrorCode.OK;
+    }
+    @Override
     public List<Chapter> findByCourseId(Course course) {
         if(course.getId()== 0){
             return null;
@@ -47,20 +65,6 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public StatusUtil.ErrorCode insert(Chapter chapter) {
-        if(chapter.getChapterOrder()==0||chapter.getName()==null||chapter.getCourseId()==0){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        if(courseMapper.findById(chapter.getCourseId())==null){
-            return StatusUtil.ErrorCode.NOT_EXISTS;
-        }
-        List<Chapter> chapters= chapterMapper.findByCourseId(chapter.getCourseId());
-        if(chapters!=null) {
-            for (Chapter it : chapters) {
-                if (it.getChapterOrder() == chapter.getChapterOrder()) {
-                    return StatusUtil.ErrorCode.ALREADY_EXISTS;
-                }
-            }
-        }
         Date date = new Date();
         chapter.setCreateTime(date);
         chapter.setUpdateTime(date);

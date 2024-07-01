@@ -22,6 +22,10 @@ public class ChapterController {
     @RequestMapping("/add")
     @ResponseBody
     public StatusUtil.ErrorCode add(@RequestBody Chapter chapter) {
+        StatusUtil.ErrorCode errorCode=chapterService.checkParams(chapter);
+        if(errorCode!=StatusUtil.ErrorCode.OK) {
+            return errorCode;
+        }
         return chapterService.insert(chapter);
     }
     @RequestMapping("/findChapter")

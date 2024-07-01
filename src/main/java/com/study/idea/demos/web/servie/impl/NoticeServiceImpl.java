@@ -29,6 +29,17 @@ public class NoticeServiceImpl implements NoticeService{
     @Autowired
     private NameUtil nameUtil;
     @Override
+    public StatusUtil.ErrorCode checkParams(Notice notice){
+        if(notice.getContent()==null||notice.getTitle()==null||notice.getTeacherId()==0||notice.getCourseId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        if(courseMapper.findById(notice.getCourseId())==null||userMapper.findById(notice.getTeacherId())==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        return StatusUtil.ErrorCode.OK;
+    }
+
+    @Override
     public List<Notice> findByUserId(User user) {
         if(user.getId()==0){
             return null;
@@ -56,12 +67,6 @@ public class NoticeServiceImpl implements NoticeService{
 
     @Override
     public StatusUtil.ErrorCode insert(Notice notice) {
-        if(notice.getContent()==null||notice.getTitle()==null||notice.getTeacherId()==0||notice.getCourseId()==0){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-        if(courseMapper.findById(notice.getCourseId())==null||userMapper.findById(notice.getTeacherId())==null){
-            return StatusUtil.ErrorCode.NOT_EXISTS;
-        }
         Date date = new Date();
         notice.setCreateTime(date);
         notice.setUpdateTime(date);

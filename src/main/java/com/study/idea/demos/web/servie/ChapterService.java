@@ -8,6 +8,7 @@ import com.study.idea.demos.web.util.StatusUtil;
 import java.util.List;
 
 public interface ChapterService {
+    StatusUtil.ErrorCode checkParams(Chapter chapter);
     List<Chapter> findByCourseId(Course course);
     StatusUtil.ErrorCode insert(Chapter chapter);
     StatusUtil.ErrorCode update(Chapter chapter);
