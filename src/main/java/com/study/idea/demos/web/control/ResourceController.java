@@ -3,6 +3,7 @@ package com.study.idea.demos.web.control;
 import com.study.idea.demos.web.entity.Chapter;
 import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.DTO.ResourceDTO;
+import com.study.idea.demos.web.entity.Progress;
 import com.study.idea.demos.web.entity.Resource;
 import com.study.idea.demos.web.entity.VO.ResourceVO;
 import com.study.idea.demos.web.servie.ResourceService;
@@ -23,17 +24,16 @@ import java.util.List;
 public class ResourceController {
     @Autowired
     private ResourceService resourceService;
-    @RequestMapping("/findResource")
-    @ResponseBody
-    public List<ResourceVO> findResource(@RequestBody Chapter chapter) {
-        List<Resource> lists= resourceService.findByChapterId(chapter);
-        return resourceService.changeToVO(lists);
-    }
     @RequestMapping("/findResourceByCourse")
     @ResponseBody
-    public List<ResourceVO> findResourceByCourse(@RequestBody Course course) {
+    public List<ResourceVO> findResourceByCourse(@RequestBody ResourceDTO resourceDTO) {
+        if(resourceDTO.getCourseId()==0){
+            return null;
+        }
+        Course course = new Course();
+        course.setId(resourceDTO.getCourseId());
         List<Resource> lists= resourceService.findByCourseId(course);
-        return resourceService.changeToVO(lists);
+        return resourceService.changeToVO(lists,resourceDTO.getUserId());
     }
     @RequestMapping("/add")
     @ResponseBody
@@ -47,6 +47,16 @@ public class ResourceController {
         resourceDTO.setType(mimeType);
         Resource resource = resourceService.changeToEntity(resourceDTO);
         return resourceService.insert(resource);
+    }
+    @RequestMapping("/learn")
+    @ResponseBody
+    public StatusUtil.ErrorCode learn(@RequestBody ResourceDTO resourceDTO) throws Exception {
+        Progress progress =new Progress();
+        progress.setUserId(resourceDTO.getUserId());
+        progress.setResourceId(resourceDTO.getId());
+        StatusUtil.ErrorCode errorCode = resourceService.insert(progress);
+        return errorCode;
+
     }
 
 }

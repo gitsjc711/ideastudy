@@ -11,4 +11,5 @@ public class ResourceVO {
     String label;
     String type;
     String url;
+    String learned;
 }

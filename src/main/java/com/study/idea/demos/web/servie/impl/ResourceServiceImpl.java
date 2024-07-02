@@ -1,18 +1,18 @@
 package com.study.idea.demos.web.servie.impl;
 
-import com.study.idea.demos.web.config.WebConfig;
 import com.study.idea.demos.web.dao.ChapterMapper;
 import com.study.idea.demos.web.dao.CourseMapper;
 import com.study.idea.demos.web.dao.ResourceMapper;
+import com.study.idea.demos.web.dao.UserMapper;
 import com.study.idea.demos.web.entity.Chapter;
 import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.DTO.ResourceDTO;
+import com.study.idea.demos.web.entity.Progress;
 import com.study.idea.demos.web.entity.Resource;
 import com.study.idea.demos.web.entity.VO.ResourceVO;
 import com.study.idea.demos.web.servie.ResourceService;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.UrlUtil;
-import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,21 +30,8 @@ public class ResourceServiceImpl implements ResourceService {
     private CourseMapper courseMapper;
     @Autowired
     private UrlUtil urlUtil;
-    @Override
-    public List<Resource> findByChapterId(Chapter chapter) {
-        if(chapter.getId()==0){
-            return null;
-        }
-        List<Resource> lists = resourceMapper.findByChapterId(chapter.getId());
-        Iterator<Resource> iterator=lists.iterator();
-        while(iterator.hasNext()){
-            Resource i = iterator.next();
-            if(i.getStatus() == 1){
-                iterator.remove();
-            }
-        }
-        return lists;
-    }
+    @Autowired
+    private UserMapper userMapper;
     @Override
     public List<Resource> findByCourseId(Course course){
         if(course.getId()==0){
@@ -82,6 +69,25 @@ public class ResourceServiceImpl implements ResourceService {
         }
     }
     @Override
+    public StatusUtil.ErrorCode insert(Progress progress){
+        if(progress.getUserId()==0||progress.getResourceId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        if(resourceMapper.findByUserIdAndResourceId(progress)!=null){
+            return StatusUtil.ErrorCode.ALREADY_EXISTS;
+        }
+        Date date = new Date();
+        progress.setCreateTime(date);
+        progress.setUpdateTime(date);
+        progress.setStatus(0);
+        if(resourceMapper.insertProgress(progress)){
+            return StatusUtil.ErrorCode.OK;
+        }else{
+            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+        }
+    }
+
+    @Override
     public StatusUtil.ErrorCode checkPram(ResourceDTO resourceDTO){
         if (resourceDTO.getChapterOrder() == 0 || resourceDTO.getName() == null||resourceDTO.getUrl()==null||resourceDTO.getCourseId()==0) {
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
@@ -108,13 +114,29 @@ public class ResourceServiceImpl implements ResourceService {
         }
         return StatusUtil.ErrorCode.OK;
     }
-    public List<ResourceVO> changeToVO(List<Resource> resources){
-        if(resources==null){
+    @Override
+    public StatusUtil.ErrorCode checkPram(Progress progress){
+        if(progress.getUserId()==0||progress.getResourceId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        return StatusUtil.ErrorCode.OK;
+    }
+    public List<ResourceVO> changeToVO(List<Resource> resources,int uid){
+        if(resources==null||userMapper.findById(uid)==null){
             return null;
         }
+        Progress progress=new Progress();
+        progress.setUserId(uid);
         List<ResourceVO> result=new ArrayList<>();
         for(Resource i:resources){
             ResourceVO resourceVO=new ResourceVO();
+            progress.setResourceId(i.getId());
+            Progress dbProgress=resourceMapper.findByUserIdAndResourceId(progress);
+            if(dbProgress!=null){
+                resourceVO.setLearned("已学习");
+            }else {
+                resourceVO.setLearned("");
+            }
             resourceVO.setId(i.getId());
             resourceVO.setLabel(i.getName());
             resourceVO.setType(i.getType());
