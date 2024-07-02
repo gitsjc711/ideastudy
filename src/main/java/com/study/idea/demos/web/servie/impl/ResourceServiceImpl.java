@@ -16,6 +16,10 @@ import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -68,6 +72,28 @@ public class ResourceServiceImpl implements ResourceService {
             return StatusUtil.ErrorCode.UNKNOWN_ERROR;
         }
     }
+    @Override
+    public StatusUtil.ErrorCode delete(Resource resource){
+        if(resource.getId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        Resource dbResource = resourceMapper.findById(resource.getId());
+        if(dbResource==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        Path path=  Paths.get(dbResource.getUrl());
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if(resourceMapper.delete(resource.getId())){
+            return StatusUtil.ErrorCode.OK;
+        }else{
+            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+        }
+    }
+
     @Override
     public StatusUtil.ErrorCode insert(Progress progress){
         if(progress.getUserId()==0||progress.getResourceId()==0){

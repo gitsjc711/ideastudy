@@ -13,6 +13,7 @@ import java.util.List;
 public interface ResourceService {
     List<Resource> findByCourseId(Course course);
     StatusUtil.ErrorCode insert(Resource resource);
+    StatusUtil.ErrorCode delete(Resource resource);
     StatusUtil.ErrorCode insert(Progress progress);
     StatusUtil.ErrorCode checkPram(ResourceDTO resourceDTO);
     StatusUtil.ErrorCode checkPram(Progress progress);

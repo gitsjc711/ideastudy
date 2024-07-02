@@ -1,6 +1,5 @@
 package com.study.idea.demos.web.control;
 
-import com.study.idea.demos.web.entity.Chapter;
 import com.study.idea.demos.web.entity.Course;
 import com.study.idea.demos.web.entity.DTO.ResourceDTO;
 import com.study.idea.demos.web.entity.Progress;
@@ -50,13 +49,16 @@ public class ResourceController {
     }
     @RequestMapping("/learn")
     @ResponseBody
-    public StatusUtil.ErrorCode learn(@RequestBody ResourceDTO resourceDTO) throws Exception {
+    public StatusUtil.ErrorCode learn(@RequestBody ResourceDTO resourceDTO) {
         Progress progress =new Progress();
         progress.setUserId(resourceDTO.getUserId());
         progress.setResourceId(resourceDTO.getId());
-        StatusUtil.ErrorCode errorCode = resourceService.insert(progress);
-        return errorCode;
-
+        return resourceService.insert(progress);
+    }
+    @RequestMapping("/delete")
+    @ResponseBody
+    public StatusUtil.ErrorCode delete(@RequestBody Resource resource) {
+        return resourceService.delete(resource);
     }
 
 }
