@@ -7,11 +7,16 @@ import com.study.idea.demos.web.dao.UserMapper;
 import com.study.idea.demos.web.entity.Chapter;
 import com.study.idea.demos.web.entity.Homework;
 import com.study.idea.demos.web.entity.HomeworkStudent;
+import com.study.idea.demos.web.entity.User;
+import com.study.idea.demos.web.entity.VO.HomeworkStudentVO;
 import com.study.idea.demos.web.servie.HomeworkService;
+import com.study.idea.demos.web.util.NameUtil;
 import com.study.idea.demos.web.util.StatusUtil;
+import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +31,10 @@ public class HomeworkServiceImpl implements HomeworkService {
     private CourseMapper courseMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private NameUtil nameUtil;
+    @Autowired
+    private UrlUtil urlUtil;
     @Override
     public StatusUtil.ErrorCode checkParams(Homework homework){
         if(homework.getCourseId()==0||homework.getChapterOrder()==0||homework.getName()==null||homework.getDescription()==null){
@@ -39,6 +48,7 @@ public class HomeworkServiceImpl implements HomeworkService {
         for(Chapter it:dbChapter){
             if(it.getChapterOrder()==homework.getChapterOrder()){
                 flag=true;
+                break;
             }
         }
         if(!flag){
@@ -87,6 +97,13 @@ public class HomeworkServiceImpl implements HomeworkService {
         }
         return false;
     }
+    @Override
+    public List<HomeworkStudent> findByHomeworkId(Homework homework){
+        if(homework.getId()==0){
+            return null;
+        }
+        return homeworkMapper.findByHomeworkId(homework.getId());
+    }
 
     @Override
     public StatusUtil.ErrorCode insert(Homework homework) {
@@ -112,4 +129,29 @@ public class HomeworkServiceImpl implements HomeworkService {
             return StatusUtil.ErrorCode.UNKNOWN_ERROR;
         }
     }
+    @Override
+    public List<HomeworkStudentVO> changeToVO(List<HomeworkStudent> list){
+        if(list==null){
+            return null;
+        }
+        List<HomeworkStudentVO> result=new ArrayList<>();
+        for (HomeworkStudent i:list){
+            HomeworkStudentVO homeworkStudentVO=new HomeworkStudentVO();
+            homeworkStudentVO.setId(i.getId());
+            homeworkStudentVO.setHomeworkType(i.getHomeworkType());
+            homeworkStudentVO.setUpdateTime(i.getUpdateTime());
+            homeworkStudentVO.setHomeworkUrl(urlUtil.changeToRequestUrl(i.getHomeworkUrl()));
+            User user=new User();
+            user.setId(i.getUserId());
+            homeworkStudentVO.setUsername(nameUtil.ChangeIdToName(user));
+            Homework homework=new Homework();
+            homework.setId(i.getHomeworkId());
+            homeworkStudentVO.setHomeworkName(nameUtil.ChangeIdToName(homework));
+            homeworkStudentVO.setUpdateTime(i.getUpdateTime());
+            result.add(homeworkStudentVO);
+        }
+        return result;
+    }
+
+
 }

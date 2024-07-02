@@ -2,6 +2,7 @@ package com.study.idea.demos.web.control;
 
 import com.study.idea.demos.web.entity.Homework;
 import com.study.idea.demos.web.entity.HomeworkStudent;
+import com.study.idea.demos.web.entity.VO.HomeworkStudentVO;
 import com.study.idea.demos.web.servie.HomeworkService;
 import com.study.idea.demos.web.util.StatusUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +54,19 @@ public class HomeworkController {
     }
     @RequestMapping("/findStatus")
     @ResponseBody
-    public boolean findSatus(@RequestBody HomeworkStudent homeworkStudent)
+    public boolean findStatus(@RequestBody HomeworkStudent homeworkStudent)
     {
         if(homeworkStudent.getUserId() == 0|| homeworkStudent.getHomeworkId() == 0){
             return false;
         }
         return homeworkService.findFinishStatus(homeworkStudent);
+    }
+    @RequestMapping("/findFinishHomework")
+    @ResponseBody
+    public List<HomeworkStudentVO> findFinishHomework(@RequestBody Homework homework)
+    {
+        List<HomeworkStudent> list = homeworkService.findByHomeworkId(homework);
+        return homeworkService.changeToVO(list);
     }
 
 }

@@ -17,6 +17,8 @@ public class NameUtil {
     private UserMapper userMapper;
     @Autowired
     private CourseMapper courseMapper;
+    @Autowired
+    private HomeworkMapper homeworkMapper;
     public String ChangeIdToName(Course course){
         Course dbCourse;
         if(course.getId()!=0){
@@ -40,6 +42,19 @@ public class NameUtil {
                 return dbUser.getAccount();
             }
         }else {
+            return null;
+        }
+    }
+    public String ChangeIdToName(Homework homework){
+        Homework dbHomework;
+        if(homework.getId()!=0){
+            dbHomework=homeworkMapper.findById(homework.getId());
+            if(dbHomework==null){
+                return null;
+            }else {
+                return dbHomework.getName();
+            }
+        }else{
             return null;
         }
     }
