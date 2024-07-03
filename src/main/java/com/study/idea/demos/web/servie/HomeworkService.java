@@ -9,11 +9,12 @@ import java.util.List;
 
 public interface HomeworkService {
     StatusUtil.ErrorCode checkParams(Homework homework);
-    StatusUtil.ErrorCode checkParams(HomeworkStudent homeworkStudent);
     List<Homework> findByClassId(Homework homework);
-    boolean findFinishStatus(HomeworkStudent homeworkStudent);
     List<HomeworkStudent> findByHomeworkId(Homework homework);
     StatusUtil.ErrorCode insert(Homework homework);
+    StatusUtil.ErrorCode teacherDelete(Homework homework);
+    StatusUtil.ErrorCode checkParams(HomeworkStudent homeworkStudent);
+    boolean findFinishStatus(HomeworkStudent homeworkStudent);
     StatusUtil.ErrorCode insert(HomeworkStudent homeworkStudent);
     List<HomeworkStudentVO> changeToVO(List<HomeworkStudent> list);
 }

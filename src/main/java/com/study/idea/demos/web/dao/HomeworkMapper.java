@@ -2,9 +2,7 @@ package com.study.idea.demos.web.dao;
 
 import com.study.idea.demos.web.entity.Homework;
 import com.study.idea.demos.web.entity.HomeworkStudent;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -18,11 +16,15 @@ public interface HomeworkMapper {
     @Insert("insert into homework(create_time, update_time, status, name, description, course_id, chapter_order) " +
             "values (#{createTime},#{updateTime},#{status},#{name},#{description},#{courseId},#{chapterOrder})")
     boolean insert(Homework homework);
-
+    @Delete("delete from homework where id=#{id}")
+    boolean delete(int id);
     @Select("select id, update_time as updateTime,status, user_id as userId, homework_id as homeworkId, homework_url as homeworkUrl , homework_type as homeworkType from homework_student where homework_id=#{homeworkId}")
     List<HomeworkStudent> findByHomeworkId(int homeworkId);
     @Insert("insert into homework_student(create_time, update_time, status, user_id, homework_id, homework_url, homework_type)" +
             "values (#{createTime},#{updateTime},#{status},#{userId},#{homeworkId},#{homeworkUrl},#{homeworkType})")
     boolean insertFinishHomework(HomeworkStudent homeworkStudent);
+    @Delete("delete from homework_student where homework_id=#{homeworkId}")
+    boolean deleteByHomeworkId(int homeworkId);
+
 
 }

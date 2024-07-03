@@ -68,5 +68,11 @@ public class HomeworkController {
         List<HomeworkStudent> list = homeworkService.findByHomeworkId(homework);
         return homeworkService.changeToVO(list);
     }
+    @RequestMapping("/teacherDelete")
+    @ResponseBody
+    public StatusUtil.ErrorCode teacherDelete(@RequestBody Homework homework)
+    {
+        return homeworkService.teacherDelete(homework);
+    }
 
 }
