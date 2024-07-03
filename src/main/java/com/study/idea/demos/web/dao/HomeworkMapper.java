@@ -13,6 +13,8 @@ public interface HomeworkMapper {
     List<Homework> findByCourseId(int courseId);
     @Select("select id,status,name,description,course_id as courseId, chapter_order as chapterOrder from homework where id=#{id}")
     Homework findById(int id);
+    @Select("select id,status,name,description,course_id as courseId, chapter_order as chapterOrder from homework where chapter_order=#{chapterOrder} and course_id=#{courseId}")
+    List<Homework> findByCourseIdAndChapterOrder(Homework homework);
     @Insert("insert into homework(create_time, update_time, status, name, description, course_id, chapter_order) " +
             "values (#{createTime},#{updateTime},#{status},#{name},#{description},#{courseId},#{chapterOrder})")
     boolean insert(Homework homework);

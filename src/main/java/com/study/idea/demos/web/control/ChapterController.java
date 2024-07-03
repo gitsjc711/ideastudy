@@ -38,4 +38,9 @@ public class ChapterController {
     public StatusUtil.ErrorCode update(@RequestBody Chapter chapter) {
         return chapterService.update(chapter);
     }
+    @RequestMapping("/delete")
+    @ResponseBody
+    public StatusUtil.ErrorCode delete(@RequestBody Chapter chapter) {
+        return chapterService.delete(chapter);
+    }
 }

@@ -13,7 +13,8 @@ public class StatusUtil {
         ALREADY_EXISTS(5004, "已存在"),
         BANNED(5005, "被封禁"),
         TIMEOUT(5006, "超时"),
-        TOO_MANY_REQUESTS(5007, "请求太频繁");
+        TOO_MANY_REQUESTS(5007, "请求太频繁"),
+        TOO_MANY_CONTAINS(5008, "内容过多");
         private final int code;
         private final String message;
         ErrorCode(int code, String message) {

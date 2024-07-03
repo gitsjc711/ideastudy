@@ -2,9 +2,11 @@ package com.study.idea.demos.web.servie.impl;
 
 import com.study.idea.demos.web.dao.ChapterMapper;
 import com.study.idea.demos.web.dao.CourseMapper;
+import com.study.idea.demos.web.dao.HomeworkMapper;
 import com.study.idea.demos.web.dao.ResourceMapper;
 import com.study.idea.demos.web.entity.Chapter;
 import com.study.idea.demos.web.entity.Course;
+import com.study.idea.demos.web.entity.Homework;
 import com.study.idea.demos.web.entity.Resource;
 import com.study.idea.demos.web.entity.VO.ChapterVO;
 import com.study.idea.demos.web.entity.VO.ResourceVO;
@@ -27,6 +29,8 @@ public class ChapterServiceImpl implements ChapterService {
     private CourseMapper courseMapper;
     @Autowired
     private ResourceMapper resourceMapper;
+    @Autowired
+    private HomeworkMapper homeworkMapper;
     @Autowired
     private UrlUtil urlUtil;
     @Override
@@ -70,6 +74,32 @@ public class ChapterServiceImpl implements ChapterService {
         chapter.setUpdateTime(date);
         chapter.setStatus(0);
         if(chapterMapper.insert(chapter)){
+            return StatusUtil.ErrorCode.OK;
+        }else{
+            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+        }
+    }
+    @Override
+    public StatusUtil.ErrorCode delete(Chapter chapter) {
+        if(chapter.getChapterOrder()==0||chapter.getCourseId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        Chapter dbChapter=chapterMapper.findByCourseIdAndChapterOrder(chapter);
+        if(dbChapter==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        List<Resource> resourceList=resourceMapper.findByChapterId(dbChapter.getId());
+        if(!resourceList.isEmpty()){
+            return StatusUtil.ErrorCode.TOO_MANY_CONTAINS;
+        }
+        Homework homework=new Homework();
+        homework.setCourseId(chapter.getCourseId());
+        homework.setChapterOrder(chapter.getChapterOrder());
+        List<Homework> homeworkList=homeworkMapper.findByCourseIdAndChapterOrder(homework);
+        if(!homeworkList.isEmpty()){
+            return StatusUtil.ErrorCode.TOO_MANY_CONTAINS;
+        }
+        if(chapterMapper.delete(dbChapter.getId())){
             return StatusUtil.ErrorCode.OK;
         }else{
             return StatusUtil.ErrorCode.UNKNOWN_ERROR;

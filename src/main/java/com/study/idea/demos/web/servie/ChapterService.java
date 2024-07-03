@@ -12,5 +12,6 @@ public interface ChapterService {
     List<Chapter> findByCourseId(Course course);
     StatusUtil.ErrorCode insert(Chapter chapter);
     StatusUtil.ErrorCode update(Chapter chapter);
+    StatusUtil.ErrorCode delete(Chapter chapter);
     List<ChapterVO> changeToVO(List<Chapter> chapters);
 }
