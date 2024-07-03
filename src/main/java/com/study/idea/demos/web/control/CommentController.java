@@ -42,4 +42,10 @@ public class CommentController {
         List<Comment> list= commentService.findByCourseId(comment);
         return commentService.changeToVO(list);
     }
+    @RequestMapping("/delete")
+    @ResponseBody
+    public StatusUtil.ErrorCode delete(@RequestBody Comment comment)
+    {
+        return commentService.delete(comment);
+    }
 }

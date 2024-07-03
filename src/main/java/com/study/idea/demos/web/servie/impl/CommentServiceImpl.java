@@ -102,5 +102,29 @@ public class CommentServiceImpl implements CommentService {
         }
         return result;
     }
+    @Override
+    public StatusUtil.ErrorCode delete(Comment comment){
+        if(comment.getId()==0||comment.getUserId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        Comment dbComment=commentMapper.findById(comment.getId());
+        if(dbComment==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        if(dbComment.getUserId()!=comment.getUserId()){
+            return StatusUtil.ErrorCode.NO_PERMISSION;
+        }
+        List<Comment> replyList=commentMapper.findByReplyId(comment.getId());
+        if(replyList!=null){
+            for(Comment i:replyList){
+                commentMapper.delete(i.getId());
+            }
+        }
+        if(commentMapper.delete(comment.getId())){
+            return StatusUtil.ErrorCode.OK;
+        }else{
+            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+        }
+    }
 
 }

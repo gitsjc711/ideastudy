@@ -11,5 +11,7 @@ public interface CommentService {
     List<Comment> findByReplyId(Comment comment);
     List<Comment> findByCourseId(Comment comment);
     StatusUtil.ErrorCode insert(Comment comment);
+    StatusUtil.ErrorCode delete(Comment comment);
     List<CommentVO> changeToVO(List<Comment> commentList);
+
 }
