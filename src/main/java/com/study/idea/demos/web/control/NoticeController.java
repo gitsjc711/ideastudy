@@ -40,4 +40,9 @@ public class NoticeController {
         List<Notice> list=noticeService.findByCourseId(course);
         return noticeService.changeToVO(list);
     }
+    @RequestMapping("/delete")
+    @ResponseBody
+    public StatusUtil.ErrorCode delete(@RequestBody Notice notice) {
+        return noticeService.delete(notice);
+    }
 }

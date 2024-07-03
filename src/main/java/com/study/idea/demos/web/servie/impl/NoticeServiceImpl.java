@@ -101,4 +101,15 @@ public class NoticeServiceImpl implements NoticeService{
         }
         return resultList;
     }
+    @Override
+    public StatusUtil.ErrorCode delete(Notice notice) {
+        if(notice.getId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        if(noticeMapper.delete(notice.getId())){
+            return StatusUtil.ErrorCode.OK;
+        }else{
+            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+        }
+    }
 }

@@ -14,5 +14,6 @@ public interface NoticeService {
     List<Notice> findByCourseId(Course course);
     StatusUtil.ErrorCode insert(Notice notice);
     List<NoticeVO> changeToVO(List<Notice> notices);
+    StatusUtil.ErrorCode delete(Notice notice);
 
 }
