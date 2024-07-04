@@ -10,5 +10,6 @@ public interface AlipayService {
     StatusUtil.ErrorCode checkOrder(Order order);
     StatusUtil.ErrorCode add(Order order);
     StatusUtil.ErrorCode pay(Order order);
+
     List<Order> findByUserId(User user);
 }

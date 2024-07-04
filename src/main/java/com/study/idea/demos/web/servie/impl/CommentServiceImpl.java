@@ -97,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
             commentVO.setReplyId(i.getReplyId());
             User user=new User();
             user.setId(i.getUserId());
-            commentVO.setUsername(nameUtil.ChangeIdToName(user));
+            commentVO.setUsername(nameUtil.ChangeIdToNickname(user));
             result.add(commentVO);
         }
         return result;

@@ -19,4 +19,5 @@ public interface OrderMapper {
     boolean insert(Order order);
     @Update("update orders set update_time=#{updateTime},status=#{status} where order_no=#{orderNo}")
     boolean update(Order order);
+
 }

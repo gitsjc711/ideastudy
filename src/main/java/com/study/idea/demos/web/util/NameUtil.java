@@ -45,6 +45,19 @@ public class NameUtil {
             return null;
         }
     }
+    public String ChangeIdToNickname(User user){
+        User dbUser;
+        if(user.getId()!=0){
+            dbUser = userMapper.findById(user.getId());
+            if(dbUser==null){
+                return null;
+            }else {
+                return dbUser.getNickname();
+            }
+        }else {
+            return null;
+        }
+    }
     public String ChangeIdToName(Homework homework){
         Homework dbHomework;
         if(homework.getId()!=0){

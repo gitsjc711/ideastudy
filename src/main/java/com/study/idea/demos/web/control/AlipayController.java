@@ -53,7 +53,6 @@ public class AlipayController {
             response.getWriter().write(check.getMessage());
             return ;
         }
-        alipayService.add(order);
         Course course=new Course();
         course.setId(order.getCourseId());
         String courseName=nameUtil.ChangeIdToName(course);
@@ -112,7 +111,13 @@ public class AlipayController {
 
             String tradeNo = params.get("out_trade_no");
             String courseName=params.get("subject");
+            Course course=new Course();
+            course.setName(courseName);
+            int courseId=nameUtil.changeNameToId(course);
             String userName=params.get("body");
+            User user=new User();
+            user.setAccount(userName);
+            int userId=nameUtil.changeNameToId(user);
             String actualPrice=params.get("total_amount");
             // 支付宝验签
             if (AlipaySignature.rsaCheckV1(params, AlipayConfig.alipay_public_key, AlipayConfig.charset, AlipayConfig.sign_type)) {
@@ -128,13 +133,10 @@ public class AlipayController {
                 System.out.println("买家账户:"+params.get("body"));
                 Order order =new Order();
                 order.setOrderNo(tradeNo);
-                Course course=new Course();
-                course.setName(courseName);
-                order.setCourseId(nameUtil.changeNameToId(course));
-                User user=new User();
-                user.setAccount(userName);
-                order.setUserId(nameUtil.changeNameToId(user));
+                order.setUserId(userId);
+                order.setCourseId(courseId);
                 order.setActualPrice(Double.parseDouble(actualPrice));
+                alipayService.add(order);
                 if(alipayService.pay(order)== StatusUtil.ErrorCode.OK){
                     System.out.println("交易成功");
                 }else{
