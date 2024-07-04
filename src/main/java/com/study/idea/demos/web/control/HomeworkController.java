@@ -79,7 +79,7 @@ public class HomeworkController {
     @ResponseBody
     public StatusUtil.ErrorCode updateFinishHomework(@RequestBody HomeworkStudent homeworkStudent)
     {
-        if(homeworkStudent.getHomeworkUrl()==null){
+        if(homeworkStudent.getHomeworkUrl()==null||homeworkStudent.getHomeworkUrl().isEmpty()){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
         Path path = new File(homeworkStudent.getHomeworkUrl()).toPath();
