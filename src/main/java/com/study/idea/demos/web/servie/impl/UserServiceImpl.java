@@ -19,6 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -81,14 +83,14 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public StatusUtil.ErrorCode update(User user,String code){
-        if(user.getAccount() == null){
+        if(user.getId() == 0){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
-        User dbUser=userMapper.findByAccount(user);
+        User dbUser=userMapper.findById(user.getId());
         if(dbUser==null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
-        if(user.getPassword()!=null){
+        if(user.getPassword()!=null&&!user.getPassword().isEmpty()){
             String psw=MD5Util.inputPassToDBPass(user.getPassword(),dbUser.getSalt());
             if(!psw.equals(dbUser.getPassword())) {
                 user.setPassword(psw);
@@ -98,10 +100,13 @@ public class UserServiceImpl implements UserService {
         }else{
             user.setPassword(dbUser.getPassword());
         }
-        if(user.getNickname()==null){
-            user.setNickname(user.getAccount());
+        if(user.getNickname()==null||user.getNickname().isEmpty()){
+            user.setNickname(dbUser.getNickname());
         }
-        if(user.getEmail()!=null){
+        if(user.getEmail()!=null&&!user.getEmail().isEmpty()){
+            if(userMapper.findByEmail(user)!=null){
+                return StatusUtil.ErrorCode.ALREADY_EXISTS;
+            }
             Object object=redisUtil.get(user.getEmail());
             if(object==null){//验证码失效
                 return StatusUtil.ErrorCode.TIMEOUT;
@@ -115,12 +120,15 @@ public class UserServiceImpl implements UserService {
         }else{
             user.setEmail(dbUser.getEmail());
         }
-        if(user.getUserAvatar()!=null){
-            Path path=  Paths.get(dbUser.getUserAvatar());
-            try {
-                Files.delete(path);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        if(user.getUserAvatar()!=null&&!user.getUserAvatar().isEmpty()){
+            List<User> users=userMapper.findByUrl(user.getUserAvatar());
+            if(users.size()==1) {
+                Path path = Paths.get(dbUser.getUserAvatar());
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }else{
             user.setUserAvatar(dbUser.getUserAvatar());
@@ -165,6 +173,16 @@ public class UserServiceImpl implements UserService {
         user.setUserAvatar(userDTO.getAvatar());
         return user;
     }
+    public User changeToUpdateEntity(UserDTO userDTO){
+        User user=new User();
+        user.setId(userDTO.getId());
+        user.setPassword(userDTO.getPassword());
+        user.setNickname(userDTO.getNickname());
+        user.setEmail(userDTO.getEmail());
+        user.setUserAvatar(userDTO.getAvatar());
+        return user;
+    }
+
     public UserVO changeToVO(User user){
         UserVO userVO=new UserVO();
         userVO.setId(user.getId());

@@ -16,11 +16,13 @@ public interface UserMapper {
     User findByEmail(User user);
     @Select("select id,status,account,salt,password,nickname,email,role,user_avatar as userAvatar from user where nickname = #{nickname}")
     List<User> findByNickname(User user);
-    @Select("select status,account,password,nickname,email,role,user_avatar as userAvatar from user where id=#{id}")
+    @Select("select id,status,account,salt,password,nickname,email,role,user_avatar as userAvatar from user where id=#{id}")
     User findById(int id);
+    @Select("select id,status,account,salt,password,nickname,email,role,user_avatar as userAvatar from user where user_avatar=#{url}")
+    List<User> findByUrl(String url);
     @Insert("insert into user(create_time,update_time,status,account,salt,password,nickname,email,role,user_avatar) " +
             "values(#{createTime},#{updateTime},#{status},#{account},#{salt},#{password},#{nickname},#{email},#{role},#{userAvatar})")
     boolean insert(User user);
-    @Update("update user set update_time=#{updateTime},status=#{status},password=#{password},nickname=#{nickname},email=#{email},role=#{role},user_avatar=#{userAvator} where account=#{account}")
+    @Update("update user set update_time=#{updateTime},status=#{status},password=#{password},nickname=#{nickname},email=#{email},role=#{role},user_avatar=#{userAvatar} where id=#{id}")
     boolean update(User user);
 }

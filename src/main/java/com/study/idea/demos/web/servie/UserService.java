@@ -13,5 +13,6 @@ public interface UserService {
     StatusUtil.ErrorCode update(User user,String code);
     User showDetails(User user);
     User changeToEntity(UserDTO userDTO);
+    User changeToUpdateEntity(UserDTO userDTO);
     UserVO changeToVO(User user);
 }
