@@ -16,6 +16,7 @@ import com.study.idea.demos.web.util.UrlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -173,6 +174,29 @@ public class HomeworkServiceImpl implements HomeworkService {
             homeworkMapper.deleteByHomeworkId(homework.getId());
         }
         if(homeworkMapper.delete(homework.getId())){
+            return StatusUtil.ErrorCode.OK;
+        }else{
+            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+        }
+    }
+    public StatusUtil.ErrorCode updateFinishHomework(HomeworkStudent homeworkStudent){
+        if(homeworkStudent.getHomeworkId()==0||homeworkStudent.getUserId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        HomeworkStudent dbHomeworkStudent=homeworkMapper.findByHomeworkIdAndUserId(homeworkStudent);
+        if(dbHomeworkStudent==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        Path path=  Paths.get(dbHomeworkStudent.getHomeworkUrl());
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Date date = new Date();
+        homeworkStudent.setUpdateTime(date);
+
+        if(homeworkMapper.updateFinishHomework(homeworkStudent)){
             return StatusUtil.ErrorCode.OK;
         }else{
             return StatusUtil.ErrorCode.UNKNOWN_ERROR;

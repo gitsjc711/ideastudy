@@ -6,12 +6,18 @@ import com.study.idea.demos.web.entity.DTO.UserDTO;
 import com.study.idea.demos.web.entity.User;
 import com.study.idea.demos.web.entity.VO.UserVO;
 import com.study.idea.demos.web.servie.UserService;
+import com.study.idea.demos.web.util.RedisUtil;
 import com.study.idea.demos.web.util.StatusUtil;
 import com.study.idea.demos.web.util.MD5Util;
 import com.study.idea.demos.web.util.UrlUtil;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,6 +25,8 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private UrlUtil urlUtil;
+    @Autowired
+    private RedisUtil redisUtil;
     @Override
     public StatusUtil.ErrorCode checkPram(User user){
         if(user == null|| user.getAccount() == null|| user.getPassword() == null||user.getEmail()==null||user.getUserAvatar()==null){
@@ -72,38 +80,55 @@ public class UserServiceImpl implements UserService {
         }
     }
     @Override
-    public StatusUtil.ErrorCode update(User user){
-        if(user == null|| user.getAccount() == null|| user.getPassword() == null||user.getEmail()==null){
+    public StatusUtil.ErrorCode update(User user,String code){
+        if(user.getAccount() == null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
-        User dbUser=userMapper.findByEmail(user);
-        if(dbUser!=null&&!dbUser.getAccount().equals(user.getAccount())){
-            return StatusUtil.ErrorCode.PARAMETER_ERROR;
-        }
-
-        dbUser=userMapper.findByAccount(user);
+        User dbUser=userMapper.findByAccount(user);
         if(dbUser==null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
-        String psw=MD5Util.inputPassToDBPass(user.getPassword(),dbUser.getSalt());
-        if(!psw.equals(dbUser.getPassword())) {
-            user.setPassword(psw);
-        }else {
+        if(user.getPassword()!=null){
+            String psw=MD5Util.inputPassToDBPass(user.getPassword(),dbUser.getSalt());
+            if(!psw.equals(dbUser.getPassword())) {
+                user.setPassword(psw);
+            }else {
+                user.setPassword(dbUser.getPassword());
+            }
+        }else{
             user.setPassword(dbUser.getPassword());
-        }
-        if(dbUser.getRole()!=0){//权限验证
-            if(user.getRole()==0){
-                return StatusUtil.ErrorCode.NO_PERMISSION;
-            }
-            if(user.getStatus()==1){
-                return StatusUtil.ErrorCode.NO_PERMISSION;
-            }
         }
         if(user.getNickname()==null){
             user.setNickname(user.getAccount());
         }
+        if(user.getEmail()!=null){
+            Object object=redisUtil.get(user.getEmail());
+            if(object==null){//验证码失效
+                return StatusUtil.ErrorCode.TIMEOUT;
+            }
+            String trueCode = String.valueOf(object);
+            if(code.equals(trueCode)) {//验证码正确
+                redisUtil.delete(user.getEmail());
+            }else{
+                return StatusUtil.ErrorCode.PARAMETER_ERROR;
+            }
+        }else{
+            user.setEmail(dbUser.getEmail());
+        }
+        if(user.getUserAvatar()!=null){
+            Path path=  Paths.get(dbUser.getUserAvatar());
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }else{
+            user.setUserAvatar(dbUser.getUserAvatar());
+        }
         Date date=new Date();
         user.setUpdateTime(date);
+        user.setStatus(dbUser.getStatus());
+        user.setRole(dbUser.getRole());
         if(userMapper.update(user)){
             return StatusUtil.ErrorCode.OK;
         }else{

@@ -10,7 +10,7 @@ public interface UserService {
     StatusUtil.ErrorCode checkLogin(User user);
     StatusUtil.ErrorCode checkPram(User user);
     StatusUtil.ErrorCode register(User user);
-    StatusUtil.ErrorCode update(User user);
+    StatusUtil.ErrorCode update(User user,String code);
     User showDetails(User user);
     User changeToEntity(UserDTO userDTO);
     UserVO changeToVO(User user);

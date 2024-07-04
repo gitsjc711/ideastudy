@@ -22,9 +22,13 @@ public interface HomeworkMapper {
     boolean delete(int id);
     @Select("select id, update_time as updateTime,status, user_id as userId, homework_id as homeworkId, homework_url as homeworkUrl , homework_type as homeworkType from homework_student where homework_id=#{homeworkId}")
     List<HomeworkStudent> findByHomeworkId(int homeworkId);
+    @Select("select id, update_time as updateTime,status, user_id as userId, homework_id as homeworkId, homework_url as homeworkUrl , homework_type as homeworkType from homework_student where homework_id=#{homeworkId} and user_id=#{userId}")
+    HomeworkStudent findByHomeworkIdAndUserId(HomeworkStudent homeworkStudent);
     @Insert("insert into homework_student(create_time, update_time, status, user_id, homework_id, homework_url, homework_type)" +
             "values (#{createTime},#{updateTime},#{status},#{userId},#{homeworkId},#{homeworkUrl},#{homeworkType})")
     boolean insertFinishHomework(HomeworkStudent homeworkStudent);
+    @Update("update homework_student set status=#{status},update_time=#{updateTime},homework_url=#{homeworkUrl},homework_type=#{homeworkType} where homework_id=#{homeworkId} and user_id")
+    boolean updateFinishHomework(HomeworkStudent homeworkStudent);
     @Delete("delete from homework_student where homework_id=#{homeworkId}")
     boolean deleteByHomeworkId(int homeworkId);
 

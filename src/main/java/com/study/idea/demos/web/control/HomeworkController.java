@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -73,6 +74,23 @@ public class HomeworkController {
     public StatusUtil.ErrorCode teacherDelete(@RequestBody Homework homework)
     {
         return homeworkService.teacherDelete(homework);
+    }
+    @RequestMapping("/updateFinishHomework")
+    @ResponseBody
+    public StatusUtil.ErrorCode updateFinishHomework(@RequestBody HomeworkStudent homeworkStudent)
+    {
+        if(homeworkStudent.getHomeworkUrl()==null){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        Path path = new File(homeworkStudent.getHomeworkUrl()).toPath();
+        String mimeType;
+        try {
+            mimeType = Files.probeContentType(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        homeworkStudent.setHomeworkType(mimeType);
+        return homeworkService.updateFinishHomework(homeworkStudent);
     }
 
 }

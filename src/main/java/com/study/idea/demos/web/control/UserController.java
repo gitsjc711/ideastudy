@@ -61,9 +61,10 @@ public class UserController {
     }
     @RequestMapping("/user/update")
     @ResponseBody
-    public StatusUtil.ErrorCode update(@RequestBody User user)//用户修改自己的信息
+    public StatusUtil.ErrorCode update(@RequestBody UserDTO userDTO)//用户修改自己的信息
     {
-        return userService.update(user);
+        User user = userService.changeToEntity(userDTO);
+        return userService.update(user,userDTO.getCode());
     }
     @RequestMapping("/user/showDetails")
     @ResponseBody

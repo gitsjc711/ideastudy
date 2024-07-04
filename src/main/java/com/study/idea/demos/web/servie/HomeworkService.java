@@ -15,6 +15,7 @@ public interface HomeworkService {
     StatusUtil.ErrorCode teacherDelete(Homework homework);
     StatusUtil.ErrorCode checkParams(HomeworkStudent homeworkStudent);
     boolean findFinishStatus(HomeworkStudent homeworkStudent);
+    StatusUtil.ErrorCode updateFinishHomework(HomeworkStudent homeworkStudent);
     StatusUtil.ErrorCode insert(HomeworkStudent homeworkStudent);
     List<HomeworkStudentVO> changeToVO(List<HomeworkStudent> list);
 }
