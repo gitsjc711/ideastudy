@@ -20,6 +20,7 @@ public interface CourseService {
 
     StatusUtil.ErrorCode insert(Course course);
     StatusUtil.ErrorCode publish(Course course);
+    StatusUtil.ErrorCode update(Course course);
     List<CourseVO> changeToVO(List<Course> courses);
     Course changeToEntity(CourseDTO courseDTO);
 }

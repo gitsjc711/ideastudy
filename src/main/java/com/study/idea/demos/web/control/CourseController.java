@@ -28,14 +28,9 @@ public class CourseController {
     @ResponseBody
     public StatusUtil.ErrorCode publish(CourseDTO courseDTO){
         Course course = courseService.changeToEntity(courseDTO);
-        Category category = new Category();
-        category.setCategoryName(courseDTO.getCategory());
-        int categoryId=nameUtil.changeNameToId(category);
-        if(categoryId==0){
+        if(course.getCategoryId()==0){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
-        course.setCategoryId(categoryId);
-        course.setCourseLogo(courseDTO.getImageUrl());
         StatusUtil.ErrorCode code= courseService.checkPram(course);
         if(code!=StatusUtil.ErrorCode.OK){
             return code;
@@ -114,6 +109,12 @@ public class CourseController {
         }
         List<Course> list =courseService.findByTeacherId(user);
         return courseService.changeToVO(list);
+    }
+    @RequestMapping("/update")
+    @ResponseBody
+    public StatusUtil.ErrorCode update(@RequestBody CourseDTO courseDTO){
+        Course course = courseService.changeToEntity(courseDTO);
+        return courseService.update(course);
     }
 
 }

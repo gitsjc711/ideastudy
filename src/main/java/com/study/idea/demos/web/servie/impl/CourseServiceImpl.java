@@ -43,6 +43,9 @@ public class CourseServiceImpl implements CourseService {
         if(course.getTeacherId()==0||course.getDescription()==null||course.getName()==null||course.getCourseLogo()==null){
             return StatusUtil.ErrorCode.PARAMETER_ERROR;
         }
+        if(courseMapper.findByName(course)!=null){
+            return StatusUtil.ErrorCode.ALREADY_EXISTS;
+        }
         return StatusUtil.ErrorCode.OK;
     }
     @Override
@@ -156,6 +159,42 @@ public class CourseServiceImpl implements CourseService {
             return StatusUtil.ErrorCode.UNKNOWN_ERROR;
         }
     }
+    @Override
+    public StatusUtil.ErrorCode update(Course course){
+        if(course.getName()==null||course.getName().isEmpty()||course.getTeacherId()==0){
+            return StatusUtil.ErrorCode.PARAMETER_ERROR;
+        }
+        Course dbCourse = courseMapper.findByName(course);
+        if(dbCourse==null){
+            return StatusUtil.ErrorCode.NOT_EXISTS;
+        }
+        if(dbCourse.getTeacherId()!=course.getTeacherId()){
+            return StatusUtil.ErrorCode.NO_PERMISSION;
+        }
+        if(course.getDescription()!=null&&!course.getDescription().isEmpty()){
+            dbCourse.setDescription(course.getDescription());
+        }
+        if(course.getPrice()>0){
+            dbCourse.setPrice(course.getPrice());
+        }
+        if(course.getCourseLogo()!=null&&!course.getCourseLogo().isEmpty()){
+            dbCourse.setCourseLogo(course.getCourseLogo());
+        }
+        if(course.getCategoryId()>0){
+            if(categoryMapper.findById(course.getCategoryId())!=null){
+                dbCourse.setCategoryId(course.getCategoryId());
+            }else{
+                return StatusUtil.ErrorCode.NOT_EXISTS;
+            }
+        }
+        Date date = new Date();
+        dbCourse.setUpdateTime(date);
+        if(courseMapper.update(dbCourse)){
+            return StatusUtil.ErrorCode.OK;
+        }else {
+            return StatusUtil.ErrorCode.UNKNOWN_ERROR;
+        }
+    }
     public List<CourseVO> changeToVO(List<Course> courses){
         if(courses==null){
             return null;
@@ -182,15 +221,19 @@ public class CourseServiceImpl implements CourseService {
         Course course = new Course();
         course.setName(courseDTO.getName());
         course.setDescription(courseDTO.getDescription());
-        double price = Double.parseDouble(courseDTO.getPrice());
-        BigDecimal bg = new BigDecimal(price);
-        double f1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-        course.setPrice(f1);
+        if(courseDTO.getPrice()==null||courseDTO.getPrice().isEmpty()){
+            course.setPrice(-1);
+        }else {
+            double price = Double.parseDouble(courseDTO.getPrice());
+            BigDecimal bg = new BigDecimal(price);
+            double f1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            course.setPrice(f1);
+        }
         course.setTeacherId(courseDTO.getTeacherId());
         Category category=new Category();
-
         category.setCategoryName(courseDTO.getCategory());
         course.setCategoryId(nameUtil.changeNameToId(category));
+        course.setCourseLogo(courseDTO.getImageUrl());
         return course;
     }
 
