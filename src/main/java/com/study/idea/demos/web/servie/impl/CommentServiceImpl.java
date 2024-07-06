@@ -9,13 +9,15 @@ import com.study.idea.demos.web.entity.VO.CommentVO;
 import com.study.idea.demos.web.servie.CommentService;
 import com.study.idea.demos.web.util.NameUtil;
 import com.study.idea.demos.web.util.StatusUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
 @Service
 public class CommentServiceImpl implements CommentService {
     @Autowired
@@ -92,7 +94,7 @@ public class CommentServiceImpl implements CommentService {
         for(Comment i:commentList){
             CommentVO commentVO=new CommentVO();
             commentVO.setId(i.getId());
-            commentVO.setUpdateTime(i.getUpdateTime());
+            commentVO.setUpdateTime(i.getUpdateTime().toString());
             commentVO.setContent(i.getContent());
             commentVO.setReplyId(i.getReplyId());
             User user=new User();

@@ -96,7 +96,7 @@ public class NoticeServiceImpl implements NoticeService{
             noticeVO.setCourse(nameUtil.ChangeIdToName(course));
             User user=new User();
             user.setId(notice.getTeacherId());
-            noticeVO.setTeacher(nameUtil.ChangeIdToName(user));
+            noticeVO.setTeacher(nameUtil.ChangeIdToNickname(user));
             resultList.add(noticeVO);
         }
         return resultList;

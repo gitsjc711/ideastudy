@@ -7,7 +7,7 @@ import java.util.Date;
 @Data
 public class CommentVO {
     int id;
-    Date updateTime;
+    String updateTime;
     String username;
     String content;
     int replyId;
